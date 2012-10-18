@@ -11,28 +11,40 @@
  */
 
 /* defaults */
-* {
-margin: 0px; border: 0px; outline: 0px; padding: 0px;
-color: black; background: transparent; text-decoration: none;
-font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif; font-weight: normal;
-font-size: 16px; /* set base font size here, all others relative using em */
-vertical-align: middle;
-}
+/** {*/
+/*margin: 0px; border: 0px; outline: 0px; padding: 0px;*/
+/*color: black; background: transparent; text-decoration: none;*/
+/*font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif; font-weight: normal;*/
+/*font-size: 16px; *//* set base font size here, all others relative using em */
+/*vertical-align: middle;*/
+/*}*/
 
 /* ========================== body, etc ========================== */
 
-body { background: #DDDDDF; margin: 0px; }
+body {
+    /*background: #DDDDDF;*/
+    margin: 0px;
+    padding: 0px;
+    position:relative;
+}
 
 #apps-container {
 background: white;
-margin: 0px auto 0px auto; border: 10px solid #DDDDDF; padding: 10px;
+margin: 0px auto 0px auto; padding: 10px;
 -moz-border-radius: 15px; -webkit-border-radius: 15px; border-radius: 15px;
 width: 980px; overflow: auto;
 }
 
 #header-logo { float: left; width: 300px; height: 30px; }
 #header-logo h1, #header-logo a { font-size: 1.5em; font-family: Courier, "Courier New", monospace; font-weight: bold; border: 0px; padding: 0px; margin: 0px; }
-#header-user { float: right; }
+#header-user{
+    float: right;
+    line-height: 40px;
+}
+#header-user form{
+    display: inline;
+}
+
 
 div.message { width: 600px; margin: 2px auto 2px auto; border: 1px solid #DDDDDF; padding: 2px; text-align: center; }
 div.message span { font-size: .9em; }
@@ -42,60 +54,64 @@ div.error span { color: red; }
 
 /* ====================== headings, general ====================== */
 
-h1 { font-size: 1.5em; font-weight: bold; }
-h2 { font-size: 1.2em; font-weight: bold; }
-h3 { font-size: 1.0em; font-weight: bold; }
-h4 { font-size: .9em; font-weight: bold; }
-h5 { font-size: .8em; font-weight: bold; }
-h6 { font-size: .6em; }
+/*h1 { font-size: 1.5em; font-weight: bold; }*/
+/*h2 { font-size: 1.2em; font-weight: bold; }*/
+/*h3 { font-size: 1.0em; font-weight: bold; }*/
+/*h4 { font-size: .9em; font-weight: bold; }*/
+/*h5 { font-size: .8em; font-weight: bold; }*/
+/*h6 { font-size: .6em; }*/
 
 tt, pre, pre code { font-family: "Courier New", Courier, monospace; }
 
-a, a span { font-size: .9em; font-weight: bold; }
-p { margin: 2px 0px 2px 0px; padding: 2px 0px 2px 0px; }
-li { margin: 0px 0px 0px 16px; padding: 0px 0px 0px 8px; }
-form { display: inline; }
+/*a, a span { font-size: .9em; font-weight: bold; }*/
+/*p { margin: 2px 0px 2px 0px; padding: 2px 0px 2px 0px; }*/
+/*li { margin: 0px 0px 0px 16px; padding: 0px 0px 0px 8px; }*/
+/*form { display: inline; }*/
 
-button, input[type="reset"], input[type="submit"], input[type="button"], a.button {
--webkit-appearance: none; -moz-border-radius: 4px; -webkit-border-radius: 4px; border-radius: 4px;
-margin: 2px 2px 2px 2px; border: 1px solid; border-color: #ddd #bbb #999; outline: 0px; padding: 2px 4px 2px 4px;
-display: inline-block; overflow: visible; width: auto; cursor: pointer;
-background: white; color: #333;
-font-size: .8em; font-weight: bold; text-decoration: none; text-shadow: #fff 0 1px 1px;
-}
+/*button, input[type="reset"], input[type="submit"], input[type="button"], a.button {*/
+/*-webkit-appearance: none; -moz-border-radius: 4px; -webkit-border-radius: 4px; border-radius: 4px;*/
+/*margin: 2px 2px 2px 2px; border: 1px solid; border-color: #ddd #bbb #999; outline: 0px; padding: 2px 4px 2px 4px;*/
+/*display: inline-block; overflow: visible; width: auto; cursor: pointer;*/
+/*background: white; color: #333;*/
+/*font-weight: bold; text-decoration: none; text-shadow: #fff 0 1px 1px;*/
+/*}*/
 
-button:active, input[type="reset"]:active, input[type="submit"]:active, input[type="button"]:active, a.button:active {
-border-color: #999 #bbb #ddd; color: #666;
-}
+/*button:active, input[type="reset"]:active, input[type="submit"]:active, input[type="button"]:active, a.button:active {*/
+/*border-color: #999 #bbb #ddd; color: #666;*/
+/*}*/
 
-input[type="text"], input[type="email"], input[type="url"], input[type="number"], input[type="password"], textarea, select {
--moz-border-radius: 4px; -webkit-border-radius: 4px; border-radius: 4px; border: 1px solid; border-color: #999 #bbb #ddd;
-margin: 2px 2px 2px 2px; padding: 2px 4px 2px 4px;
-font-size: .8em; font-family: Lucida Console, Monaco, monospace;
-}
+/*input[type="text"], input[type="email"], input[type="url"], input[type="number"], input[type="password"], textarea, select {*/
+/*-moz-border-radius: 4px; -webkit-border-radius: 4px; border-radius: 4px; border: 1px solid; border-color: #999 #bbb #ddd;*/
+/*margin: 2px 2px 2px 2px; padding: 2px 4px 2px 4px;*/
+/*font-size: .8em; font-family: Lucida Console, Monaco, monospace;*/
+/*}*/
 
 input:required:invalid, input:invalid, textarea:invalid { background-color: #FDD; }
 input:focus:valid, textarea:focus:valid { background-color: #EEE; }
 
-th { text-align: left; padding: 0px 4px 0px 2px; }
-td { padding: 0px 4px 0px 2px; }
-tr:nth-child(odd) { background-color: #EEE; }
+/*th { text-align: left; padding: 0px 4px 0px 2px; }*/
+/*td { padding: 0px 4px 0px 2px; }*/
+/*tr:nth-child(odd) { background-color: #EEE; }*/
 /*tr:nth-child(even) { background-color: #FFF; }*/
-tr:hover { background-color: #DDD; }
+/*tr:hover { background-color: #DDD; }*/
 
 /* ======================= XML Form Styles ======================= */
 
 .form-list-paginate a, .form-list-paginate span { padding-right: 4px;
-    font-family: "Courier New", monospace; font-weight: bold; font-size: .8em; vertical-align: top; }
+    font-family: "Courier New", monospace; font-weight: bold; vertical-align: top; }
 
 fieldset.form-single-outer {
 margin: 4px;
 -moz-border-radius: 4px; -webkit-border-radius: 4px; border-radius: 4px; border: 1px solid #DDDDDF;
-padding: 4px; width: 95%;
+padding: 4px;
 }
 
-.single-form-field { padding-right: 10px; }
-.single-form-field span { font-size: .8em; }
+.single-form-field {
+    padding-right: 10px;
+    padding-bottom: 3px;
+    padding-top: 3px;
+}
+/*.single-form-field span { font-size: .8em; }*/
 .single-form-field span input { margin-right: 4px; }
 label.form-title { vertical-align: middle; display: inline-block; width: 120px; }
 
@@ -103,7 +119,7 @@ label.form-title { vertical-align: middle; display: inline-block; width: 120px; 
 .field-row-item { float: left; display: inline-block; }
 
 .form-list-outer {
-margin: 4px;
+/*margin: 4px;*/
 border: 1px solid #DDDDDF; -moz-border-radius: 4px; -webkit-border-radius: 4px; border-radius: 4px;
 padding: 4px; width: 100%;
 display: table; table-layout: auto; border-collapse: separate; empty-cells: show;
@@ -113,9 +129,9 @@ display: table; table-layout: auto; border-collapse: separate; empty-cells: show
 .form-header-cell { display: table-cell; text-align: left; padding: 0px 4px 0px 2px; }
 .form-body { display: table-row-group; }
 .form-row { display: table-row; background-color: #FFF; }
-.form-cell { display: table-cell; padding: 0px 4px 0px 2px; font-size: .8em; }
+.form-cell { display: table-cell; padding: 0px 4px 0px 2px;}
 .form-row:nth-child(odd) { background-color: #EEE; }
-/* .form-row:nth-child(even) { background-color: #FFF; } */
+.form-row:nth-child(even) { background-color: #FFF; }
 .form-row:hover { background-color: #DDD; }
 
 .form-title { padding: 0px 8px 0px 2px; font-size: .9em; font-weight: bold; }
@@ -124,7 +140,7 @@ display: table; table-layout: auto; border-collapse: separate; empty-cells: show
 .form-header-field { white-space: nowrap; }
 .form-header-cell, .form-header-cell div.form-title { vertical-align: top; }
 
-.form-date-find span, .form-range-find span, .form-text-find span, .form-text-find select { font-size: .8em; }
+/*.form-date-find span, .form-range-find span, .form-text-find span, .form-text-find select { font-size: .8em; }*/
 
 /* This is the +/- in the header, use fixed width font for consistent sizing, Courier New has the best vertical alignment with + and - */
 a.form-order-by { margin: 0px; padding: 0px; font-family: "Courier New", monospace; font-weight: bold; font-size: 1.2em; vertical-align: top; }
@@ -133,7 +149,7 @@ a.active { color: red; }
 
 /* ======================= Screen-specific ======================= */
 
-#login-box { width: 280px; margin: 0px auto 0px auto; padding: 10px; }
+#login-box { width: 320px; margin: 0px auto 0px auto; padding: 10px; }
 
 #ArtifactHitBins-table tbody tr td, #ArtifactHitBins-table thead tr th, #ArtifactHitBins-table thead tr th div select,
 #ArtifactHitBins-table thead tr th div input { font-size: .7em; }
