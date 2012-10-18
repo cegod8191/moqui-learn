@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-1.2.xsd"
+        include-child-content="true"><!--  -->
+    <subscreens default-item="hello">
+        <subscreens-item name="hello" menu-index="3" menu-title="hello" />
+        <!-- <subscreens-item name="FindTutorial" menu-index="4" menu-title="FindTutorial" /> -->
+    </subscreens>
+    <!--<pre-actions>-->
+        <!--<set field="html_stylesheets" from="[-->
+    		<!--'/resources/bootstrap/css/bootstrap.css'-->
+    		<!--,'/resources/datatables/css/jquery.dataTables.css'-->
+    		<!--,'/css/default2.css'-->
+    	<!--]"/>-->
+
+        <!--<set field="html_scripts" from="[-->
+            <!--'/js/jquery-1.8.2.min.js', '/js/jquery-ui-1.9.0.min.js'-->
+            <!--,'/js/jquery-ui-timepicker-addon-1.0.0.js', '/js/jquery-ui-combobox.js', '/js/jquery-validate-1.9.0.min.js'-->
+
+    		<!--,'/resources/bootstrap/js/bootstrap.js'-->
+    		<!--,'/resources/datatables/js/jquery.dataTables.js'-->
+    		<!--,'/js/dataTables.js'-->
+    		<!--,'/resources/my97DatePicker/WdatePicker.js'-->
+    	<!--]"/>-->
+    <!--</pre-actions>-->
+    <widgets>
+        <subscreens-panel id="tutorial-app" type="tab"/>
+    </widgets>
+</screen>

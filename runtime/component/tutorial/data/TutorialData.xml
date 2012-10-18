@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-facade-xml type="seed">
+    <Tutorial tutorialId="TestOne" description="Test one description."/>
+    <Tutorial tutorialId="TestTwo" description="Test two description."/>
+</entity-facade-xml>
