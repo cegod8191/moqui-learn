@@ -40,6 +40,7 @@ class MoquiServlet extends HttpServlet {
     void doScreenRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         ExecutionContextFactory executionContextFactory =
                 (ExecutionContextFactory) getServletContext().getAttribute("executionContextFactory")
+	//solve the problem of Chinese submit code
         request.setCharacterEncoding("UTF-8")
         String moquiWebappName = getServletContext().getInitParameter("moqui-name")
 
