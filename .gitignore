@@ -1,6 +1,5 @@
 .idea/
 .gradle/
-moqui.iml
 framework/build/
 framework/.gradle/
 moqui-*.war
@@ -9,7 +8,5 @@ runtime/db/derby/MoquiTransactional/
 runtime/db/derby/derby.log
 runtime/log/
 runtime/mantle/
-
 .DS_Store
 
-framework.iml
