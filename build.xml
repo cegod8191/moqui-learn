@@ -63,6 +63,9 @@ The actual build is done with Gradle.
             <jvmarg value="-server"/>
             <jvmarg value="-Xmx256M"/>
             <jvmarg value="-XX:MaxPermSize=64m"/>
+            <jvmarg value="-Dfile.encoding=UTF-8"/>
+            <jvmarg value="-Xdebug"/>
+            <jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8091"/>
         </java>
     </target>
     <target name="load" description="Run Moqui data loader (run the executable war file with -load)">

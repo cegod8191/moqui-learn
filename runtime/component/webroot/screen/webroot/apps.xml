@@ -21,6 +21,8 @@ This Work includes contributions authored by David E. Jones, not as a
                          menu-title="Example" menu-index="8"/>
         <subscreens-item name="tools" location="component://tools/screen/Tools.xml"
                          menu-title="Tools" menu-index="9"/>
+        <subscreens-item name="tutorial" location="component://tutorial/screen/tutorial.xml"
+                         menu-title="tutorial"/>
     </subscreens>
 
     <widgets>
@@ -49,7 +51,7 @@ This Work includes contributions authored by David E. Jones, not as a
                     <widgets><container style="message error"><label text="${validationError.message} (for field ${validationError.field})"/></container></widgets>
                 </section-iterate>
 
-                <subscreens-menu type="popup" id="header-menu" title="Application"/>
+                <subscreens-menu type="popup" id="header-menu" title="Application1"/>
                 <subscreens-active/>
             </panel-center>
             <panel-footer>
