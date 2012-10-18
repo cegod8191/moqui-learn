@@ -28,16 +28,26 @@ This Work includes contributions authored by David E. Jones, not as a
     <widgets>
         <container-panel id="apps-container">
             <panel-header>
-                <container id="header-logo"><label text="Welcome to Moqui" type="h1"/></container>
-                <section name="headerUser">
-                    <condition><compare field="ec.user.userId" operator="not-empty"/></condition>
-                    <widgets>
-                        <container id="header-user">
-                            <label text="${ec.user.userAccount?.userFullName}"/>
-                            <link text="Logout" url="/Login/logout"/>
+                <container style="navbar navbar-inverse">
+                    <container style="navbar-inner">
+                        <container style="container">
+                            <section name="headerUser">
+                                <condition><compare field="ec.user.userId" operator="not-empty"/></condition>
+                                <widgets>
+                                    <container id="header-user">
+                                        <label text="${ec.user.userAccount?.userFullName}"/>
+                                        <link text="Logout" url="/Login/logout" style="btn-small"/>
+                                    </container>
+                                </widgets>
+                            </section>
+                            <container style="nav-collapse subnav-collapse">
+                                <subscreens-menu type="tab" id="header-menu" title="Application1" dropdown="hover"/>
+                            </container>
+
                         </container>
-                    </widgets>
-                </section>
+                    </container>
+                </container>
+
             </panel-header>
             <panel-center>
                 <section-iterate name="headerMessages" list="ec.message.messages" entry="message">
@@ -51,7 +61,6 @@ This Work includes contributions authored by David E. Jones, not as a
                     <widgets><container style="message error"><label text="${validationError.message} (for field ${validationError.field})"/></container></widgets>
                 </section-iterate>
 
-                <subscreens-menu type="popup" id="header-menu" title="Application1"/>
                 <subscreens-active/>
             </panel-center>
             <panel-footer>
