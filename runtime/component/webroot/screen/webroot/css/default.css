@@ -19,6 +19,9 @@
 /*vertical-align: middle;*/
 /*}*/
 
+/* needed to get buttons inside and outside forms to align */
+div, form { vertical-align: top; }
+
 /* ========================== body, etc ========================== */
 
 body {
@@ -44,7 +47,6 @@ width: 980px; overflow: auto;
 #header-user form{
     display: inline;
 }
-
 
 div.message { width: 600px; margin: 2px auto 2px auto; border: 1px solid #DDDDDF; padding: 2px; text-align: center; }
 div.message span { font-size: .9em; }
@@ -80,11 +82,16 @@ tt, pre, pre code { font-family: "Courier New", Courier, monospace; }
 /*border-color: #999 #bbb #ddd; color: #666;*/
 /*}*/
 
-/*input[type="text"], input[type="email"], input[type="url"], input[type="number"], input[type="password"], textarea, select {*/
-/*-moz-border-radius: 4px; -webkit-border-radius: 4px; border-radius: 4px; border: 1px solid; border-color: #999 #bbb #ddd;*/
-/*margin: 2px 2px 2px 2px; padding: 2px 4px 2px 4px;*/
-/*font-size: .8em; font-family: Lucida Console, Monaco, monospace;*/
-/*}*/
+input[type=""], input[type="text"], input[type="email"], input[type="url"], input[type="number"], input[type="password"], textarea, select {
+-moz-border-radius: 4px; -webkit-border-radius: 4px; border-radius: 4px; border: 1px solid; border-color: #999 #bbb #ddd;
+margin: 2px 2px 2px 2px; padding: 2px 4px 2px 4px;
+font-size: .8em; font-family: Lucida Console, Monaco, monospace;
+}
+
+select option {
+margin: 2px 2px 2px 2px; padding: 2px 4px 2px 4px;
+font-size: 1em; font-family: Lucida Console, Monaco, monospace;
+}
 
 input:required:invalid, input:invalid, textarea:invalid { background-color: #FDD; }
 input:focus:valid, textarea:focus:valid { background-color: #EEE; }
@@ -129,7 +136,8 @@ display: table; table-layout: auto; border-collapse: separate; empty-cells: show
 .form-header-cell { display: table-cell; text-align: left; padding: 0px 4px 0px 2px; }
 .form-body { display: table-row-group; }
 .form-row { display: table-row; background-color: #FFF; }
-.form-cell { display: table-cell; padding: 0px 4px 0px 2px;}
+.form-cell { display: table-cell; padding: 0px 4px 0px 2px; font-size: 1em; }
+.form-bottom-row { display: table-caption; caption-side: bottom; text-align: left; vertical-align: middle; width: 100%; }
 .form-row:nth-child(odd) { background-color: #EEE; }
 .form-row:nth-child(even) { background-color: #FFF; }
 .form-row:hover { background-color: #DDD; }
@@ -159,8 +167,9 @@ a.active { color: red; }
 /* ================ Overrides for jquery-ui theme ================ */
 
 .ui-widget { font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif; font-size: 1em; }
-.ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button {
-    font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif; font-size: .8em; }
+.ui-widget button { font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif; font-size: 0.8em; }
+input.ui-widget, select.ui-widget, select option.ui-widget, textarea.ui-widget, li.ui-menu-item a {
+    font-family: Lucida Console, Monaco, monospace; font-size: .8em; }
 
 .ui-button-icon-only { width: 1.1em; }
 button.ui-button-icon-only { width: 1.1em; }
@@ -168,16 +177,16 @@ button.ui-button-icon-only { width: 1.1em; }
 button.ui-button-icons-only { width: 1.5em; }
 .ui-button .ui-button-text { display: block; line-height: .4;  }
 
-.ui-tabs { position: relative; padding: 0em; zoom: 1; border: 0px; }
+.ui-tabs { position: relative; padding: 0px; zoom: 1; border: 0px; }
 .ui-tabs .ui-tabs-nav { margin: 0; padding: .1em .2em 0; }
 .ui-tabs .ui-tabs-nav li a { float: left; padding: .1em .5em; text-decoration: none; }
 .ui-tabs .ui-tabs-panel { display: block; border-width: 0; padding: 4px 0px; background: none; }
 
-.ui-menu { z-index: 9; display: inline-block; overflow: visible; white-space: nowrap; }
+.ui-menu { z-index: 9; display: inline-block; overflow: visible; white-space: nowrap; margin-bottom: 4px; }
 
 /* ================ Extensions for jquery-ui theme =============== */
 
-.ui-autocomplete-input { border: 1px solid #aaaaaa; font-size: .8em; width: 300px; }
+.ui-autocomplete-input { border: 1px solid #aaaaaa; font-size: .8em; width: 300px; padding: 2px; padding-left: 4px; }
 .ui-autocomplete-loading { background: white url('/images/wait_anim_16x16.gif') right center no-repeat; }
 .ui-loading { background: white url('/images/wait_anim_16x16.gif') right center no-repeat; }
 

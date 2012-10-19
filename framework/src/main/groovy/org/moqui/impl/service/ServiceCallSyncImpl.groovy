@@ -76,8 +76,11 @@ class ServiceCallSyncImpl extends ServiceCallImpl implements ServiceCallSync {
             EntityDefinition ed = sfi.ecfi.entityFacade.getEntityDefinition(noun)
             if (ed != null) inParameterNames = ed.getAllFieldNames()
         }
+        if (parameters.get("_isMulti") == "true") multi = true
         if (multi) {
             for (int i = 0; ; i++) {
+                if ((parameters.get("_useRowSubmit") == "true" || parameters.get("_useRowSubmit_" + i) == "true")
+                        && parameters.get("_rowSubmit_" + i) != "true") continue
                 Map<String, Object> currentParms = new HashMap()
                 for (String ipn in inParameterNames) {
                     String key = ipn + "_" + i
@@ -209,6 +212,7 @@ class ServiceCallSyncImpl extends ServiceCallImpl implements ServiceCallSync {
                 throw e
             } catch (Throwable t) {
                 tf.rollback(beganTransaction, "Error running service [${getServiceName()}] (Throwable)", t)
+                logger.warn("Error running service [${getServiceName()}] (Throwable)", t)
                 // add all exception messages to the error messages list
                 eci.getMessage().addError(t.getMessage())
                 Throwable parent = t.getCause()
