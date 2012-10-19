@@ -56,6 +56,7 @@ The actual build is done with Gradle.
             <jvmarg value="-Xmx512M"/>
             <jvmarg value="-XX:MaxPermSize=128m"/>
             <jvmarg value="-Dmoqui.conf=conf/MoquiProductionConf.xml"/>
+            <jvmarg value="-Dfile.encoding=UTF-8"/>
         </java>
     </target>
     <target name="run" description="Run Moqui Web server in dev/default mode with Embedded Winstone (run the executable war file)">
