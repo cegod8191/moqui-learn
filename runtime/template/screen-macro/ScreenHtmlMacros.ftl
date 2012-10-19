@@ -651,7 +651,7 @@ This Work includes contributions authored by David E. Jones, not as a
 						    </#if>
 							<#assign sortAble = fieldSubNode["@show-order-by"]?if_exists>
 							<#if fieldNode_index gt 0>,</#if>
-	                        {"mData": "${fieldSubNode?parent["@name"]}", "bSortable": <#if sortAble?has_content>${sortAble}<#else>false</#if>, "bVisible": <#if visable>true<#else>false</#if>}
+	                        {"mData": "${fieldSubNode?parent["@name"]}", "bSortable": <#if sortAble?has_content>${sortAble}<#else>true</#if>, "bVisible": <#if visable>true<#else>false</#if>}
 	                    </#if>
 	                </#list>
 		        ],
