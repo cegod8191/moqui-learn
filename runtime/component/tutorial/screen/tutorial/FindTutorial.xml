@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-1.1.xsd"
+        xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-1.2.xsd"
         standalone="false">
  	
     <transition name="createTutorial_1">
@@ -104,7 +104,7 @@
         		
         	</row-actions>
         	<field name="checkbox" style="th-checkbox">
-        		<!-- <header-field title="" show-order-by="false"></header-field> -->
+        		<header-field title="" show-order-by="false"></header-field>
         		<default-field title=""><check></check></default-field>
         	</field>
         	<auto-fields-entity entity-name="Tutorial" field-type="display"/>
@@ -118,7 +118,7 @@
         		<header-field title="描述" show-order-by="true"></header-field>
             	<default-field><display/></default-field>
             </field>
-            <field name="lastUpdatedStamp" hide="true"><default-field><display/></default-field></field>
+            <field name="lastUpdatedStamp"><header-field title="描述" show-order-by="false"></header-field><default-field><display/></default-field></field>
             <!-- <field name="operateMenu" style="th-operate-menu"><default-field title="操作"><menu transition="menu"/></default-field></field> -->
         </form-list>
         <container style="clearfix"></container>

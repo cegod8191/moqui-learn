@@ -649,9 +649,9 @@ This Work includes contributions authored by David E. Jones, not as a
 						        <#-- this only makes sense for fields with a single conditional -->
 						        <#assign fieldSubNode = fieldNode["conditional-field"][0]>
 						    </#if>
-							<#assign sortAble = fieldSubNode["@show-order-by"]?if_exists>
+							<#assign sortAble = fieldSubNode["@show-order-by"]?if_exists != "false">
 							<#if fieldNode_index gt 0>,</#if>
-	                        {"mData": "${fieldSubNode?parent["@name"]}", "bSortable": <#if sortAble?has_content>${sortAble}<#else>true</#if>, "bVisible": <#if visable>true<#else>false</#if>}
+	                        {"mData": "${fieldSubNode?parent["@name"]}", "bSortable": <#if sortAble>true<#else>false</#if>, "bVisible": <#if visable>true<#else>false</#if>}
 	                    </#if>
 	                </#list>
 		        ],

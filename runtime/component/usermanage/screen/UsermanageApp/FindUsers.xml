@@ -60,22 +60,6 @@
             <field name="searchButton"><default-field title="Find"><submit style="btn-primary" for="ListTutorials"/></default-field></field>
         </form-single>
 
-        <nav style="nav-pills" trigger="hover">
-            <menu name="test" title="选择" down-arrow="true">
-                <menu-item name="item1" title="全选" click="dataTablesSelectAll('#ListTutorials input[name=checkbox]')"></menu-item>
-                <menu-item name="item2" title="反选" click="dataTablesReverseSelect('#ListTutorials input[name=checkbox]')"></menu-item>
-            </menu>
-
-            <menu name="test2" title="测试2" down-arrow="true">
-                <menu-item name="item1" transition="createTutorial_1"></menu-item>
-                <menu-item name="item2" style="divider"></menu-item>
-                <menu-item name="item3">
-                    <menu name="submenu">
-                        <menu-item name="item31" transition="createTutorial_1"></menu-item>
-                    </menu>
-                </menu-item>
-            </menu>
-        </nav>
         <toolbar>
             <button-group>
                 <button style="btn-small" click="dataTablesSelectAll('#ListUserAccount input[name=checkbox]')">全选</button>
@@ -107,7 +91,7 @@
 
             </row-actions>
             <field name="checkbox" style="th-checkbox">
-                <!-- <header-field title="" show-order-by="false"></header-field> -->
+                <header-field title="" show-order-by="false"></header-field>
                 <default-field title=""><check></check></default-field>
             </field>
             <!--<auto-fields-entity entity-name="UserAccount" field-type="display"/>-->
