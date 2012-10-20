@@ -54,29 +54,7 @@
     </screen-facade>
 
     <entity-facade crypt-pass="MoquiDevDefaultPassword:CHANGEME">
-        <!-- <datasource group-name="transactional" database-conf-name="mysql" schema-name="moquitransactional">
-            <inline-jdbc jdbc-uri="jdbc:mysql://localhost:8889/moquitransactional?autoReconnect=true"
-				 jdbc-username="root" jdbc-password="" pool-minsize="2"
-				 pool-maxsize="50" />
-        </datasource>
-        <datasource group-name="analytical" database-conf-name="mysql" schema-name="moquianalytical">
-            <inline-jdbc jdbc-uri="jdbc:mysql://localhost:8889/moquianalytical?autoReconnect=true"
-				 jdbc-username="root" jdbc-password="" pool-minsize="2"
-				 pool-maxsize="50" />
-        </datasource>
-        <datasource group-name="tenantcommon" database-conf-name="mysql" schema-name="moquitenantcommon">
-            <inline-jdbc jdbc-uri="jdbc:mysql://localhost:8889/moquitenantcommon?autoReconnect=true"
-				 jdbc-username="root" jdbc-password="" pool-minsize="2"
-				 pool-maxsize="50" />
-        </datasource>  -->
-        <!-- <datasource group-name="transactional" database-conf-name="oracle" schema-name="MOQUI">
-            <inline-jdbc jdbc-uri="jdbc:oracle:thin:@127.0.0.1:1521:urpdb"
-                    jdbc-username="moqui" jdbc-password="moqui"
-                    pool-minsize="2" pool-maxsize="50"/>
-        </datasource>-->
-        <datasource group-name="transactional_nosql" object-factory="org.moqui.addons.orientdb.OrientDatasourceFactory">
-            <inline-other uri="local:runtime/db/orient/transactional" username="moqui" password="moqui"/>
-        </datasource>
+        <!-- add datasource elements here to configure databases -->
     </entity-facade>
 
     <repository-list>
