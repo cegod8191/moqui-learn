@@ -166,7 +166,7 @@ abstract class EntityFindBase implements EntityFind {
             Object value = inf.get(fn)
             String op = inf.get(fn + "_op")
             if (value != null || op != null) {
-                if (op) op = "contains"
+                if (op == null) op = "contains"
                 boolean not = (inf.get(fn + "_not") == "Y")
                 boolean ic = (inf.get(fn + "_ic") == "Y")
 
