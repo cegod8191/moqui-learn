@@ -12,7 +12,7 @@ This Work includes contributions authored by David E. Jones, not as a
 -->
 <screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-1.2.xsd"
-        require-authentication="false" screen-theme-type-enum-id="STT_INTERNAL">
+        require-authentication="false" screen-theme-type-enum-id="STT_INTERNAL" allow-extra-path="true">
     <!-- NOTE: require-authentication=false is required to allow sub-screens to decide. -->
 
     <subscreens default-item="example">
