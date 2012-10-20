@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <entity-facade-xml type="seed">
     <!-- the subscreen -->
-    <moqui.screen.SubscreensItem screenLocation="component://webroot/screen/webroot/apps.xml"
-                                 subscreenName="usermanage" userGroupId="ADMIN" subscreenLocation="component://usermanage/screen/UsermanageApp.xml"
-                                 menuTitle="用户管理" menuIndex="11" menuInclude="Y"/>
+    <!--<moqui.screen.SubscreensItem screenLocation="component://webroot/screen/webroot/apps.xml"-->
+                                 <!--subscreenName="usermanage" userGroupId="ADMIN" subscreenLocation="component://usermanage/screen/UsermanageApp.xml"-->
+                                 <!--menuTitle="用户管理" menuIndex="11" menuInclude="Y"/>-->
 
     <!-- authz/permission for admin -->
     <moqui.security.ArtifactGroup artifactGroupId="USERMANAGE" description="用户管理"/>
