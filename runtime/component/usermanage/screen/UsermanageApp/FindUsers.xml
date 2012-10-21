@@ -1,42 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-1.2.xsd"
-        standalone="false" default-menu-title="查找用户">
+        standalone="false" default-menu-title="登录账号管理">
 
-    <transition name="createTutorial_1">
-        <service-call name="create#Tutorial"/>
+    <transition name="createUserAccount">
+        <service-call name="create#UserAcount"/>
         <default-response url="."/>
     </transition>
 
-    <transition name="test">
-        <actions>
-            <script location="component://tutorial/script/tutorial/camelTest.groovy" />
-        </actions>
-        <!-- <service-call name="tutorial.TutorialServices.create#Tutorial"/> -->
-        <default-response type="none"/>
-    </transition>
-
-    <transition name="createTutorial_3">
-        <service-call name="tutorial.TutorialServices.create#Tutorial"/>
+    <transition name="createUserAccount_test">
+        <service-call name="usermanage.UserAccountServices.create#UserAccount"/>
         <default-response url="."/>
-    </transition>
-
-    <transition name="tutorialData">
-        <actions>
-            <!-- <entity-find entity-name="Tutorial" list="tutorialList">
-               <search-form-inputs/>
-
-           </entity-find>
-           <set field="isEcho" from="context.isEcho" default-value="1"/>
-           <log level="info" message="===============${context}"/>
-           <set field="result" from="[isEcho:isEcho, iTotalRecords:tutorialListCount, iTotalDisplayRecords:tutorialListCount, aaData:tutorialList]"/>
-
-           <script>ec.web.sendJsonResponse(result)</script> -->
-            <service-call name="tutorial.TutorialServices.respondDataTables">
-                <field-map field-name="entity" value="Tutorial"/>
-            </service-call>
-        </actions>
-        <default-response type="none"></default-response>
     </transition>
 
     <actions>
@@ -53,51 +27,40 @@
 
     <widgets>
 
-        <form-single name="FindTutorials">
+        <form-single name="FindUserAccount">
             <!-- <field name="tutorialId"><default-field><text-find/></default-field></field>
                 -->
-            <auto-fields-entity entity-name="Tutorial" field-type="find"/>
-            <field name="searchButton"><default-field title="Find"><submit style="btn-primary" for="ListTutorials"/></default-field></field>
+            <auto-fields-entity entity-name="UserAccount" field-type="find"/>
+            <field name="searchButton"><default-field title="Find"><submit style="btn-primary" for="ListUserAccount"/></default-field></field>
         </form-single>
 
-        <toolbar>
+        <toolbar id="toolbarUserAccount">
             <button-group>
-                <button style="btn-small" click="dataTablesSelectAll('#ListUserAccount input[name=checkbox]')">全选</button>
-                <button style="btn-small" click="dataTablesReverseSelect('#ListUserAccount input[name=checkbox]')">反选</button>
+                <button style="btn-small" click="dataTablesSelectAll('ListUserAccount')">全选</button>
+                <button style="btn-small" click="dataTablesReverseSelect('ListUserAccount')">反选</button>
             </button-group>
 
             <button-group>
-                <menu name="test" title="选择" down-arrow="true">
-                    <menu-item name="item1" title="全选" click="dataTablesSelectAll('#ListUserAccount input[name=checkbox]')"></menu-item>
-                    <menu-item name="item2" title="反选" click="dataTablesReverseSelect('#ListUserAccount input[name=checkbox]')"></menu-item>
-                </menu>
-            </button-group>
-
-            <button-group>
-                <menu name="test2" title="测试2" down-arrow="true">
-                    <menu-item name="item1" transition="createTutorial_1"></menu-item>
-                    <menu-item name="item2" style="divider"></menu-item>
-                    <menu-item name="item3">
-                        <menu name="submenu">
-                            <menu-item name="item31" transition="createTutorial_1"></menu-item>
-                        </menu>
-                    </menu-item>
-                </menu>
+                <!--<menu name="test2" title="测试2" down-arrow="true">-->
+                    <!--<menu-item name="item1" transition="createUserAccount"></menu-item>-->
+                    <!--<menu-item name="item2" transition="createUserAccount"></menu-item>-->
+                <!--</menu>-->
+                <button style="btn-small" click="ListUserAccount.submit()" validchecked="1">修改</button>
             </button-group>
         </toolbar>
-        <form-list name="ListUserAccount" list="listUserAccount" render="{'type':'dataTables', 'selectMode':'multi'}">
+        <form-list name="ListUserAccount" list="listUserAccount" render="{'type':'dataTables', 'selectMode':'single', 'toolbar': 'toolbarUserAccount'}">
             <row-actions>
                 <set field="checkbox" from="userId"/>
 
             </row-actions>
-            <field name="checkbox" style="th-checkbox">
+            <field name="userId" style="th-checkbox">
                 <header-field title="" show-order-by="false"></header-field>
                 <default-field title=""><check></check></default-field>
             </field>
             <!--<auto-fields-entity entity-name="UserAccount" field-type="display"/>-->
-            <field name="userId">
-                <default-field><display></display></default-field>
-            </field>
+            <!--<field name="userId">-->
+                <!--<default-field><display></display></default-field>-->
+            <!--</field>-->
             <field name="username">
                 <default-field><display></display></default-field>
             </field>
@@ -108,17 +71,14 @@
                 <default-field><display></display></default-field>
             </field>
             <field name="disabled">
-                <header-field title="${hide}">
-                    <display/>
-                </header-field>
                 <default-field><display></display></default-field>
             </field>
             <field name="lastUpdatedStamp" hide="true"><default-field><display/></default-field></field>
             <!-- <field name="operateMenu" style="th-operate-menu"><default-field title="操作"><menu transition="menu"/></default-field></field> -->
         </form-list>
-        <container style="clearfix"></container>
-        <container-dialog id="CreateTutorialDialog" button-text="Create Tutorial" style="btn-primary">
-            <form-single name="CreateTutorial" transition="createTutorial_3">
+        <!--<container style="clearfix"></container>-->
+        <container-dialog id="CreateUserAccountDialog" button-text="建立新账号" style="btn-primary">
+            <form-single name="CreateTutorial" transition="createUserAccount">
                 <auto-fields-entity entity-name="Tutorial" field-type="edit"/>
                 <field name="tutorialId" validate-parameter="aaa" validate-service="tutorial.TutorialServices.respondDataTables">
                     <default-field>

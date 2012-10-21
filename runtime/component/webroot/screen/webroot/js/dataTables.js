@@ -208,21 +208,41 @@ function convertDataTablesParameters(params, form){
 	}
 }
 
-function dataTablesSelectAll(selector){
-	$(selector).each(function(i, checkbox){
+function dataTablesSelectAll(table_id){
+	$('#' + table_id + ' input[name=checkbox]').each(function(i, checkbox){
 		checkbox.checked = true;
 		$(checkbox).parents('tr').addClass('row_selected');
 	});
 }
 
-function dataTablesReverseSelect(selector){
-	$(selector).each(function(i, checkbox){
+function dataTablesReverseSelect(table_id){
+    var $table = $('#' + table_id);
+    var checked_count = $table.data('checked_count');
+    if (checked_count == null) checked_count = 0;
+    $table.find('input[name=checkbox]').each(function(i, checkbox){
 		checkbox.checked = !checkbox.checked;
-		if (checkbox.checked)
-			$(checkbox).parents('tr').addClass('row_selected');
-		else
-			$(checkbox).parents('tr').removeClass('row_selected');
-	});
+		if (checkbox.checked){
+            $(checkbox).parents('tr').addClass('row_selected');
+            checked_count ++;
+        }
+		else{
+            checked_count --;
+            $(checkbox).parents('tr').removeClass('row_selected');
+        }
+        $table.data('checked_count', checked_count);
+        var toolbar = $table.attr('toolbar');
+        $('#' + toolbar).find('button').each(function(i, button){
+            var validchecked = $(button).attr('validchecked');
+            if (validchecked){
+                if (validchecked == checked_count){
+                    $(button).removeAttr('disabled');
+                }
+                else{
+                    $(button).attr('disabled', 'disabled');
+                }
+            }
+        });
+    });
 }
 
 
@@ -274,21 +294,48 @@ $(document).ready(function(){
    });
    
    $('.table tbody td').live('click', function(e){
-		//alert(this);
 	});
     
-   //checkbox框单击事件
-   $('.table tbody td input[type=checkbox]').live('click', function(){
-	   var $tr = $(this).parents('tr');
-	  if(this.checked){
-		  $tr.addClass('row_selected');
-		  //var data = window.ListTutorialsTable.fnGetData( $tr.get(0) );
-		  //alert(data);
-	  }
-	  else{
-		  $tr.removeClass('row_selected');
-	  }
-   });
+    //checkbox框单击事件
+    $('.table tbody td input[type=checkbox]').live('click', function(){
+	    var $tr = $(this).parents('tr');
+        var $table = $(this).parents('table');
+        var checked_count = $table.data('checked_count');
+        if (checked_count == null) checked_count = 0;
+        var selectMode = $table.attr('selectMode');
+        var current_input = this;
+        if (selectMode == 'single'){
+            $table.find('input[type=checkbox]').each(function(i, input){
+                if (current_input != input && input.checked == true){
+                    input.checked = false;
+                    $(input).parents('tr').removeClass('row_selected');
+                }
+            });
+            checked_count = 0;
+        }
+        if(this.checked){
+            this.checked = true;
+		    $tr.addClass('row_selected');
+            checked_count ++;
+        }
+	    else{
+		    $tr.removeClass('row_selected');
+            checked_count --;
+	    }
+        $table.data('checked_count', checked_count);
+        var toolbar = $table.attr('toolbar');
+        $('#' + toolbar).find('button').each(function(i, button){
+            var validchecked = $(button).attr('validchecked');
+            if (validchecked){
+                if (validchecked == checked_count){
+                    $(button).removeAttr('disabled');
+                }
+                else{
+                    $(button).attr('disabled', 'disabled');
+                }
+            }
+        });
+    });
    
    $('.table tbody td div.dropdown').live('focus', function(){
 	   if ($(this).children('ul.dropdown-menu').length == 0 && !$(this).hasClass('loading')){
