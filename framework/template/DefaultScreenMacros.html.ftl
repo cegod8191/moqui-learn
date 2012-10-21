@@ -412,7 +412,7 @@ ${sri.renderIncludeScreen(.node["@location"], .node["@share-scope"]?if_exists)}
     <#if !skipEnd></form></#if>
     <#if !skipStart>
             <script>$("#${formNode["@name"]}").validate();</script>
-            <script>$(document).tooltip();</script>
+            <script>//$(document).tooltip();</script>
     </#if>
     <#if formNode["@focus-field"]?has_content><script>$("#${formNode["@name"]}_${formNode["@focus-field"]}").focus();</script></#if>
 <#if sri.doBoundaryComments()><!-- END   form-single[@name=${.node["@name"]}] --></#if>
@@ -556,7 +556,7 @@ ${sri.renderIncludeScreen(.node["@location"], .node["@share-scope"]?if_exists)}
             <#if isMulti && !skipStart>
                 <script>
                     $("#${formNode["@name"]}").validate();
-                    $(document).tooltip();
+                    //$(document).tooltip();
                 </script>
             </#if>
             </div><!-- close table-body -->
@@ -628,7 +628,7 @@ ${sri.renderIncludeScreen(.node["@location"], .node["@share-scope"]?if_exists)}
             <#if isMulti && !skipStart>
             <script>
                 $("#${formNode["@name"]}").validate();
-                $(document).tooltip();
+                //$(document).tooltip();
             </script>
             </#if>
             ${sri.safeCloseList(listObject)}<#-- if listObject is an EntityListIterator, close it -->
