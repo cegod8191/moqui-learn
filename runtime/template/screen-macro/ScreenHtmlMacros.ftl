@@ -488,11 +488,13 @@ This Work includes contributions authored by David E. Jones, not as a
 <#macro renderDataTables formNode>
 	<#assign curUrlInfo = sri.getCurrentScreenUrl()>
 	<#assign selectMode = (render_data.selectMode)?if_exists>
+    <#assign toolbar = (render_data.toolbar)?if_exists>
 	<#if selectMode == 'multi'>
 	<#else>
 	</#if>
 	<#-- var toolbar_div = $('#${formNode["@name"]}-table_length').next(); -->
-	<table id="${formNode["@name"]}" class="table table-bordered">
+    <form id="${formNode["@name"]}-form" action="${urlInfo.url}" method="post">
+	<table id="${formNode["@name"]}" class="table table-bordered"<#if toolbar?has_content> toolbar="${toolbar}"</#if><#if selectMode?has_content> selectMode="${selectMode}"</#if>>
 		<thead>
 			<tr>
 	            <#assign needHeaderForm = sri.isFormHeaderForm(formNode["@name"])>
@@ -568,6 +570,7 @@ This Work includes contributions authored by David E. Jones, not as a
 	        ${sri.safeCloseList(listObject)}<#-- if listObject is an EntityListIterator, close it -->				
 		</tbody>
 	</table>
+    </form>
 	<script>
 		$(document).ready(function() {
 			//return;
@@ -585,7 +588,7 @@ This Work includes contributions authored by David E. Jones, not as a
 			// 		    $('#${formNode["@name"]} tbody tr').each( function () {
 			// 		        this.insertBefore(  nCloneTd.cloneNode( true ), this.childNodes[0] );
 			// 		    } );
-			
+			window.${formNode["@name"]} = $('#${formNode["@name"]}-form');
 		    window.${formNode["@name"]}Table = $('#${formNode["@name"]}').dataTable( {
 		        "bProcessing": true,
 		        "bServerSide": true,
@@ -964,8 +967,9 @@ This Work includes contributions authored by David E. Jones, not as a
 
 <#-- ============================= 工具条 ================================ -->
 <#macro toolbar>
-	<#assign fieldStyle = .node["@style"]?if_exists>
-	<div class="btn-toolbar<#if fieldStyle?has_content> ${fieldStyle}</#if>"<#if trigger?has_content> trigger="${trigger}"</#if>>
+    <#assign id = .node["@id"]?if_exists>
+    <#assign fieldStyle = .node["@style"]?if_exists>
+	<div<#if id?has_content> id="${id}"</#if> class="btn-toolbar<#if fieldStyle?has_content> ${fieldStyle}</#if>"<#if trigger?has_content> trigger="${trigger}"</#if>>
 		<#recurse>
 	</div>	
 </#macro>
@@ -982,5 +986,6 @@ This Work includes contributions authored by David E. Jones, not as a
 <#macro button>
 	<#assign fieldStyle = .node["@style"]?if_exists>
 	<#assign click = .node["@click"]?if_exists>
-	<button class="btn<#if fieldStyle?has_content> ${fieldStyle}</#if>"<#if click?has_content> onclick="${click}"></#if><#recurse></button>
+    <#assign validchecked = .node["@validchecked"]?if_exists>
+	<button<#if validchecked?has_content> validchecked="${validchecked}" disabled="disabled"</#if> class="btn<#if fieldStyle?has_content> ${fieldStyle}</#if>"<#if click?has_content> onclick="${click}"</#if>><#recurse></button>
 </#macro>
