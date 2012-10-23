@@ -2,10 +2,16 @@
 <screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-1.2.xsd"
         include-child-content="true"><!--  -->
-    <subscreens default-item="hello">
-        <subscreens-item name="hello" menu-index="3" menu-title="hello" />
+    <subscreens default-item="FindTutorial">
         <!-- <subscreens-item name="FindTutorial" menu-index="4" menu-title="FindTutorial" /> -->
     </subscreens>
+    <!-- state machine test-->
+    <transition name="statemachineTest">
+        <actions>
+            <script location="component://tutorial/script/tutorial/stateMachineTest.groovy"></script>
+        </actions>
+        <default-response type="none"></default-response>
+    </transition>
     <!--<pre-actions>-->
         <!--<set field="html_stylesheets" from="[-->
     		<!--'/resources/bootstrap/css/bootstrap.css'-->

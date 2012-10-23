@@ -1,4 +1,4 @@
-import org.moqui.impl.context.ExecutionContextFactoryImpl
+import org.moqui.context.ExecutionContext
 import org.moqui.addons.statemachine.StateMachine
 import org.moqui.addons.statemachine.XmlStateMachine
 import org.apache.log4j.Logger
@@ -7,7 +7,12 @@ import org.moqui.impl.actions.XmlAction
 def logger = Logger.getLogger("test");
 
 class StateMachineTests {
-     def logger = Logger.getLogger("test");
+    def logger = Logger.getLogger("test");
+    ExecutionContext ec
+
+    StateMachineTests(ExecutionContext ec){
+        this.ec = ec
+    }
 
     void testBasicTransition() {
         def subject = [state:"state_a"]
@@ -203,7 +208,7 @@ class StateMachineTests {
     }
 }
 
-StateMachineTests test = new StateMachineTests()
+StateMachineTests test = new StateMachineTests(ec)
 test.testBasicTransition()
 test.testActionPerformed()
 test.testDslBuildsCorrectStructure()
