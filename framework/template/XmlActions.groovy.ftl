@@ -22,6 +22,16 @@ import org.moqui.impl.StupidUtilities
 <#macro "row-actions">
 <#recurse/>
 </#macro>
+<#-- state machine screen -->
+<#macro "onentry">
+    <#recurse/>
+</#macro>
+<#macro "cond">
+    <#recurse/>
+</#macro>
+<#macro "action">
+    <#recurse/>
+</#macro>
 
 <#-- NOTE should we handle out-map?has_content and async!=false with a ServiceResultWaiter? -->
 <#macro "service-call">
