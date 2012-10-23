@@ -11,11 +11,16 @@ This Work includes contributions authored by David E. Jones, not as a
 "work for hire", who hereby disclaims any copyright to the same.
 -->
 <screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-1.1.xsd">
+        xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-1.2.xsd">
 
 
+    <actions>
+        <set field="xmlLocation" value="component://tutorial/statemachine/sm1.xml"/>
+        <script location="component://tutorial/script/tutorial/getStateMachineNode.groovy"></script>
+    </actions>
     <widgets>
-        <!-- <subscreens-panel id="example-panel" type="tab" dynamic="true"/> -->
-        <text>aaa hello</text>
+        <render-mode>
+            <text type="html" location="component://tutorial/screen/includes/statemachine.ftl"></text>
+        </render-mode>
     </widgets>
 </screen>
