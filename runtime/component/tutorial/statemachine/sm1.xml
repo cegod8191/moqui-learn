@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scxml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="http://www.w3.org/2005/07/scxml"
+       version="1.0"
+       initialstate="hello">
+
+    <state id="hello">
+        <transition event="e1" target="end" cond="true">
+            <action>
+                <log level="info" message="----------------------state hello: ${it}"  />
+            </action>
+        </transition>
+
+    </state>
+
+    <state id="end">
+        <onentry>
+            <log level="info" message="----------------------state end: ${it}"  />
+        </onentry>
+    </state>
+</scxml>
