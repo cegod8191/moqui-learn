@@ -1,18 +1,10 @@
-import org.moqui.context.ExecutionContext
 import org.moqui.addons.statemachine.StateMachine
-import org.moqui.addons.statemachine.XmlStateMachine
 import org.apache.log4j.Logger
-import org.moqui.impl.actions.XmlAction
 
 def logger = Logger.getLogger("test");
 
 class StateMachineTests {
     def logger = Logger.getLogger("test");
-    ExecutionContext ec
-
-    StateMachineTests(ExecutionContext ec){
-        this.ec = ec
-    }
 
     void testBasicTransition() {
         def subject = [state:"state_a"]
@@ -192,23 +184,14 @@ class StateMachineTests {
         //财务部操作
         StateMachine.transition("超过预算", machineMap, subject)
         //领导操作
-        StateMachine.transition("审核不通过", machineMap, subject)
+        StateMachine.transition("审核通过", machineMap, subject)
 
-        assert "采购下单完成" == subject.state
+        assert "审核完成" == subject.state
     }
 
-    void xmlBildTest(){
-        XmlStateMachine xsm = new XmlStateMachine(ec)
-        xsm.buildFromXml("component://tutorial/statemachine/sm1.xml")
-
-        def subject = [state: "hello"]
-        xsm.transition("e1", subject)
-
-        logger.info("======== subject" : subject)
-    }
 }
 
-StateMachineTests test = new StateMachineTests(ec)
+StateMachineTests test = new StateMachineTests()
 test.testBasicTransition()
 test.testActionPerformed()
 test.testDslBuildsCorrectStructure()
@@ -216,4 +199,3 @@ test.testcondedTransition()
 test.testcondedTransitionWithDsl()
 test.shouldAllowAnActionOnEntryToAState()
 test.testFlow1()
-test.xmlBildTest()

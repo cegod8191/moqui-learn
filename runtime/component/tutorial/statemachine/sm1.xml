@@ -2,18 +2,39 @@
 <scxml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:noNamespaceSchemaLocation="http://www.w3.org/2005/07/scxml"
        version="1.0"
-       initialstate="hello">
+       initialstate="start">
 
-    <state id="hello">
-        <transition event="e1" target="end" cond="true">
+    <state id="start">
+        <position x="50" y="100"/>
+        <transition target="apply">
+        </transition>
+    </state>
+
+    <state id="apply" label="采购申请">
+        <position x="120" y="160"/>
+        <transition event="检查额度" target="examine" cond="it.amount&gt;=10000" label="额度超限">
+            <action>
+                <log level="info" message="----------------------额度超限"  />
+            </action>
+        </transition>
+        <transition event="检查额度" target="end" cond="it.amount&lt;10000" label="未超额度">
+            <action>
+                <log level="info" message="----------------------未超额度"  />
+            </action>
+        </transition>
+    </state>
+
+    <state id="examine" label="审核">
+        <position x="320" y="160"/>
+        <transition event="e1" target="end" cond="true" label="通过">
             <action>
                 <log level="info" message="----------------------state hello: ${it}"  />
             </action>
         </transition>
-
     </state>
 
-    <state id="end">
+    <state id="end" final="true">
+        <position x="300" y="20"/>
         <onentry>
             <log level="info" message="----------------------state end: ${it}"  />
         </onentry>

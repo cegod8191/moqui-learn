@@ -2,8 +2,8 @@ package org.moqui.addons.statemachine
 
 class StateMachine {
     protected final static org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(StateMachine.class)
-    private Map stateMachineMap = [:]
-    private def currentState, currentEvent
+    protected Map stateMachineMap = [:]
+    protected def currentState, currentEvent
 
     static Map transition(event, Map state_machine, subject) {
         if (!state_machine.containsKey(subject.state)){
@@ -11,7 +11,7 @@ class StateMachine {
         }
         def event_has_exists = false
         def transition = state_machine[subject.state].find {
-            if (it instanceof Map && it.event == event){
+            if (it instanceof Map && (event == null || it.event == event)){
                 event_has_exists = true
                 !it.cond || it.cond(subject)
             }

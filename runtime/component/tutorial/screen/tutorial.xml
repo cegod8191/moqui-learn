@@ -5,13 +5,6 @@
     <subscreens default-item="FindTutorial">
         <!-- <subscreens-item name="FindTutorial" menu-index="4" menu-title="FindTutorial" /> -->
     </subscreens>
-    <!-- state machine test-->
-    <transition name="statemachineTest">
-        <actions>
-            <script location="component://tutorial/script/tutorial/stateMachineTest.groovy"></script>
-        </actions>
-        <default-response type="none"></default-response>
-    </transition>
     <!--<pre-actions>-->
         <!--<set field="html_stylesheets" from="[-->
     		<!--'/resources/bootstrap/css/bootstrap.css'-->

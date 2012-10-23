@@ -11,14 +11,48 @@ This Work includes contributions authored by David E. Jones, not as a
 "work for hire", who hereby disclaims any copyright to the same.
 -->
 <screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-1.2.xsd">
+        xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-1.2.xsd" default-menu-title="工作流">
 
+    <!-- 状态机测试 -->
+    <transition name="statemachineTest">
+        <actions>
+            <script location="component://tutorial/script/tutorial/stateMachineTest.groovy"></script>
+        </actions>
+        <default-response type="none"></default-response>
+    </transition>
+
+    <!-- 执行工作流 -->
+    <transition name="wfexec">
+        <actions>
+            <script>
+                def xsm = new org.moqui.addons.statemachine.XmlStateMachine(ec)
+                xsm.build("component://tutorial/statemachine/sm1.xml")
+                def subject = [id: 10001]
+                if (context.state){
+                    subject.state = context.state
+                    xsm.transition(context.event, subject)
+                }
+                else{
+                    xsm.start(subject)
+                }
+                ec.web.sendJsonResponse(subject)
+            </script>
+        </actions>
+        <default-response type="none"></default-response>
+    </transition>
 
     <actions>
         <set field="xmlLocation" value="component://tutorial/statemachine/sm1.xml"/>
         <script location="component://tutorial/script/tutorial/getStateMachineNode.groovy"></script>
     </actions>
     <widgets>
+        <toolbar>
+            <button-group>
+                <button style="btn-small" click="" validchecked="1">保存</button>
+                <button style="btn-small" click="test_exec()">测试执行</button>
+            </button-group>
+        </toolbar>
+
         <render-mode>
             <text type="html" location="component://tutorial/screen/includes/statemachine.ftl"></text>
         </render-mode>

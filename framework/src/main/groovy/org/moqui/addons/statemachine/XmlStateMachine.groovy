@@ -3,20 +3,20 @@ package org.moqui.addons.statemachine
 import org.moqui.impl.actions.XmlAction
 import org.moqui.context.ExecutionContext
 
-class XmlStateMachine {
+class XmlStateMachine extends StateMachine{
     protected ExecutionContext ec
-    protected Map stateMachine
+    protected String initial_state
     XmlStateMachine(ExecutionContext ec) {
         this.ec = ec
     }
 
-    public Map buildFromXml(String filePath){
+    public Map build(String filePath){
         def fileStream = this.ec.ecfi.resourceFacade.getLocationStream(filePath)
 
         Node smNode = new XmlParser().parse(fileStream)
 
         Map smMap = new HashMap()
-        def initialstate = smNode."@initialstate"
+        this.initial_state = smNode."@initialstate"
 
         for (Node stateNode in smNode."state"){
             def nodeMap = []
@@ -48,13 +48,16 @@ class XmlStateMachine {
             }
             smMap.put(stateNode."@id", nodeMap)
         }
-        this.stateMachine = smMap
+        this.stateMachineMap = smMap
         return smMap
     }
 
+    public Map start(Map subject){
+        subject.state = this.initial_state
+        return StateMachine.transition(null, this.stateMachineMap, subject)
+    }
+
     public Map transition(event, subject) {
-
-        StateMachine.transition(event, this.stateMachine, subject)
-
+        return StateMachine.transition(event, this.stateMachineMap, subject)
     }
 }
