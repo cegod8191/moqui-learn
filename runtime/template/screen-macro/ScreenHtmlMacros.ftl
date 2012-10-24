@@ -600,6 +600,14 @@ This Work includes contributions authored by David E. Jones, not as a
 				// 				],
 				"aaSorting": [],
 		        "sAjaxSource": "${curUrlInfo.url}",
+                "fnServerData": function ( sSource, aoData, fnCallback, oSettings ) {
+                    oSettings.jqXHR = $.ajax( {
+                        "type": "POST",
+                        "url": sSource,
+                        "data": aoData,
+                        "success": fnCallback
+                    } );
+                },
 				"bDeferRender": true,
 				"sServerMethod": "POST",
 				<#-- "sDom": "<'row'<'span4'l<'toolbar'>><'span8'<\"toolbar\">f>r>t<'row'<'span4'i><'span8'p>>", -->
@@ -987,5 +995,11 @@ This Work includes contributions authored by David E. Jones, not as a
 	<#assign fieldStyle = .node["@style"]?if_exists>
 	<#assign click = .node["@click"]?if_exists>
     <#assign validchecked = .node["@validchecked"]?if_exists>
-	<button<#if validchecked?has_content> validchecked="${validchecked}" disabled="disabled"</#if> class="btn<#if fieldStyle?has_content> ${fieldStyle}</#if>"<#if click?has_content> onclick="${click}"</#if>><#recurse></button>
+    <#assign id = .node["@id"]?if_exists>
+	<button
+        <#t><#if id?has_content> id="${id}"</#if>
+        <#t><#if validchecked?has_content> validchecked="${validchecked}" disabled="disabled"</#if>
+        <#t> class="btn<#if fieldStyle?has_content> ${fieldStyle}</#if>"
+        <#t><#if click?has_content> onclick="${click}"</#if>
+        <#t>><#recurse></button>
 </#macro>

@@ -176,6 +176,75 @@ sSortDir_0	asc
 */
 
 
+$.fn.dataTableExt.oApi.fnAjaxUpdateDraw = function ( oSettings, html )
+{
+    var pos = html.indexOf("}");
+    var json_string = html.substr(0, pos + 1);
+    var json = jQuery.parseJSON(json_string);
+
+    if ( json.sEcho !== undefined )
+    {
+        /* Protect against old returns over-writing a new one. Possible when you get
+         * very fast interaction, and later queries are completed much faster
+         */
+        if ( json.sEcho*1 < oSettings.iDraw ){
+            return;
+        }
+        else{
+            oSettings.iDraw = json.sEcho * 1;
+        }
+    }
+
+    if ( !oSettings.oScroll.bInfinite ||
+        (oSettings.oScroll.bInfinite && (oSettings.bSorted || oSettings.bFiltered)) )
+    {
+        this._fnClearTable( oSettings );
+    }
+    oSettings._iRecordsTotal = parseInt(json.iTotalRecords, 10);
+    oSettings._iRecordsDisplay = parseInt(json.iTotalDisplayRecords, 10);
+
+    /* Determine if reordering is required */
+    var sOrdering = this._fnColumnOrdering(oSettings);
+    var bReOrder = (json.sColumns !== undefined && sOrdering !== "" && json.sColumns != sOrdering );
+    var aiIndex;
+    if ( bReOrder )
+    {
+        aiIndex = _fnReOrderIndex( oSettings, json.sColumns );
+    }
+
+    oSettings.aiDisplay = oSettings.aiDisplayMaster.slice();
+
+    $(oSettings.nTBody).html(html.substring(pos + 1));
+
+    oSettings.bAjaxDataGet = false;
+    //this._fnDraw( oSettings );
+
+    this._fnCallbackFire( oSettings, 'aoDrawCallback', 'draw', [oSettings] );
+
+    /* Draw is complete, sorting and filtering must be as well */
+    oSettings.bSorted = false;
+    oSettings.bFiltered = false;
+    oSettings.bDrawing = false;
+
+    if ( oSettings.oFeatures.bServerSide )
+    {
+        this._fnProcessingDisplay( oSettings, false );
+        if ( !oSettings._bInitComplete )
+        {
+            this._fnInitComplete( oSettings );
+        }
+    }
+
+    oSettings.bAjaxDataGet = true;
+
+
+    this._fnProcessingDisplay( oSettings, false );
+};
+
+
+
+
+
 function convertDataTablesParameters(params, form){
 	var m = {};
 	for (var i = 0; i < params.length; i ++){

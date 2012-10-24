@@ -13,6 +13,10 @@
         <default-response url="."/>
     </transition>
 
+    <transition name="editUserAccount">
+        <default-response url="."/>
+    </transition>
+
     <actions>
         <if condition="context.renderMode == 'json'">
             <entity-find entity-name="UserAccount" list="listUserAccount">
@@ -53,7 +57,7 @@
                 <set field="checkbox" from="userId"/>
 
             </row-actions>
-            <field name="userId" style="th-checkbox">
+            <field name="checkbox" style="th-checkbox">
                 <header-field title="" show-order-by="false"></header-field>
                 <default-field title=""><check></check></default-field>
             </field>
@@ -62,7 +66,7 @@
                 <!--<default-field><display></display></default-field>-->
             <!--</field>-->
             <field name="username">
-                <default-field><display></display></default-field>
+                <default-field><link url="editUserAccount" text="${username}"/></default-field>
             </field>
             <field name="emailAddress">
                 <default-field><display /></default-field>

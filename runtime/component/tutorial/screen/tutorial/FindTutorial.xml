@@ -75,14 +75,14 @@
 		</nav>
 		<toolbar>
 			<button-group>
-				<button style="btn-small" click="dataTablesSelectAll('#ListTutorials input[name=checkbox]')">全选</button>
-				<button style="btn-small" click="dataTablesReverseSelect('#ListTutorials input[name=checkbox]')">反选</button>
+				<button style="btn-small" click="dataTablesSelectAll('ListTutorials')">全选</button>
+				<button style="btn-small" click="dataTablesReverseSelect('ListTutorials')">反选</button>
 			</button-group>
 			
 			<button-group>
 				<menu name="test" title="选择" down-arrow="true">
-					<menu-item name="item1" title="全选" click="dataTablesSelectAll('#ListTutorials input[name=checkbox]')"></menu-item>
-					<menu-item name="item2" title="反选" click="dataTablesReverseSelect('#ListTutorials input[name=checkbox]')"></menu-item>
+					<menu-item name="item1" title="全选" click="dataTablesSelectAll('ListTutorials')"></menu-item>
+					<menu-item name="item2" title="反选" click="dataTablesReverseSelect('ListTutorials')"></menu-item>
 				</menu>
 			</button-group>
 			
@@ -118,7 +118,7 @@
         		<header-field title="描述" show-order-by="true"></header-field>
             	<default-field><display/></default-field>
             </field>
-            <field name="lastUpdatedStamp"><header-field title="描述" show-order-by="false"></header-field><default-field><display/></default-field></field>
+            <field name="lastUpdatedStamp"><header-field title="最后更新时间" show-order-by="false"></header-field><default-field><display/></default-field></field>
             <!-- <field name="operateMenu" style="th-operate-menu"><default-field title="操作"><menu transition="menu"/></default-field></field> -->
         </form-list>
         <container style="clearfix"></container>

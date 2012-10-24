@@ -1866,7 +1866,7 @@
 				
 				oSettings.fnServerData.call( oSettings.oInstance, oSettings.sAjaxSource, aoData,
 					function(json) {
-						_fnAjaxUpdateDraw( oSettings, json );
+                        DataTable.ext.oApi.fnAjaxUpdateDraw( oSettings, json );
 					}, oSettings );
 				return false;
 			}
