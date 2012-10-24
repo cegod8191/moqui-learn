@@ -30,7 +30,7 @@ This Work includes contributions authored by David E. Jones, not as a
     </transition>
     <transition name="uploadExampleContent">
         <actions><script><![CDATA[
-            org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(this.class)
+            org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger("upload")
             org.moqui.context.ExecutionContext ec = context.ec
             org.apache.commons.fileupload.FileItem contentFile = context.contentFile
             String fileName = contentFile.getName()

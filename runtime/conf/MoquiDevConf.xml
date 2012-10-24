@@ -58,7 +58,7 @@
     </entity-facade>
 
     <repository-list>
-        <repository name="main" location="http://localhost:8081/server" type="davex" workspace="development"/>
+        <repository name="main" location="http://localhost:8081/jackrabbit/server" type="davex" workspace="development"/>
     </repository-list>
     <component-list>
         <!-- This loads the example component over top of the default one, which will result in a warning but works
