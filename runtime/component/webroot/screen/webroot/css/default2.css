@@ -132,3 +132,6 @@ table.dataTable thead th{
 .table tr.even.row_selected:hover {
     background-color: #efefcc;
 }
+
+/* 解决joint连接器拖动转角乱跳的现象 */
+.ui-tabs{position:inherit;}

@@ -49,7 +49,7 @@ This Work includes contributions authored by David E. Jones, not as a
         <toolbar>
             <button-group>
                 <button style="btn-small" click="" validchecked="1">保存</button>
-                <button style="btn-small" click="test_exec()">测试执行</button>
+                <button id="btn_exec" style="btn-small" click="test_exec()">测试执行</button>
             </button-group>
         </toolbar>
 

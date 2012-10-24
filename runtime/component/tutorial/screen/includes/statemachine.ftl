@@ -1,7 +1,11 @@
+<script src="/resources/joint/json2.js" type="text/javascript"></script>
 <script src="/resources/joint/raphael.js" type="text/javascript"></script>
 <script src="/resources/joint/joint.js" type="text/javascript"></script>
+<script src="/resources/joint/joint.arrows.js"" type="text/javascript"></script>
 <script src="/resources/joint/joint.dia.js" type="text/javascript"></script>
+<script src="/resources/joint/joint.dia.serializer.js" type="text/javascript"></script>
 <script src="/resources/joint/joint.dia.fsa.js" type="text/javascript"></script>
+
 
 <div id="myfsa"></div>
 
@@ -16,6 +20,7 @@ function test_exec(){
     var event_name;
     if (currnt_state){
         if (state_machine[currnt_state].transitions && state_machine[currnt_state].transitions.length > 0){
+            if(state_machine[currnt_state].object == "EndState")
             event_name = state_machine[currnt_state].transitions[0].event;
         }
     }
@@ -27,14 +32,18 @@ function test_exec(){
             if (subject && subject.id){
                 currnt_state = subject.state;
                 state_machine[subject.state].highlight();
+                if(state_machine[subject.state].object == "EndState"){
+                    $('#btn_exec').attr('disabled', true);
+                    $('#btn_exec').text('流程结束');
+                }
             }
         }
     })
 }
 
 $(document).ready(function(){
-    Joint.paper("myfsa", 960, 200);
     var fsa = Joint.dia.fsa;
+    Joint.paper("myfsa", 960, 200);
 
     var all_state_array = [];
     <#list xmlNode["state"] as stateNode>
@@ -76,15 +85,9 @@ $(document).ready(function(){
             }
         }
     }
-
+    //解决firefox自动保存button状态的问题
+    $('#btn_exec').attr('disabled', false);
 })
 
-//    var se = fsa.EndState.create({ position: {x: 450, y: 150} });
-//    var s1 = fsa.State.create({ position: {x: 120, y: 120}, label: "state 1" });
-//    var s2 = fsa.State.create({ position: {x: 300, y: 50}, label: "state 2" });
 
-//    var all = [s0, s1, s2, se];
-//    s0.joint(s1, fsa.arrow).register(all);
-//    s1.joint(s2, fsa.arrow).register(all);
-//    s2.joint(se, fsa.arrow).register(all);
 </script>
