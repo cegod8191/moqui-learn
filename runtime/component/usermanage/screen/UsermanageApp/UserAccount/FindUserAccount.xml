@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-1.2.xsd"
-        standalone="false" default-menu-title="登录账号管理">
+        default-menu-title="登录账号管理">
 
     <transition name="createUserAccount">
         <service-call name="create#UserAcount"/>
@@ -14,7 +14,7 @@
     </transition>
 
     <transition name="editUserAccount">
-        <default-response url="."/>
+        <default-response url="../EditUserAccount"/>
     </transition>
 
     <actions>

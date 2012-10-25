@@ -342,7 +342,7 @@ class ScreenDefinition {
                 return defaultResponse
             }
 
-            sri.ec.context.push()
+            //sri.ec.context.push()//transition的default-response 取不到参数parameter问题修正
             sri.ec.context.put("sri", sri)
             if (actions) actions.run(sri.ec)
 
@@ -358,7 +358,7 @@ class ScreenDefinition {
             if (ri == null) ri = defaultResponse
 
             // don't pop the context until after evaluating conditions so that data set in the actions can be used
-            sri.ec.context.pop()
+            //sri.ec.context.pop()//transition的default-response 取不到参数parameter问题修正
 
             // all done so pop the artifact info; don't bother making sure this is done on errors/etc like in a finally
             // clause because if there is an error this will help us know how we got there
@@ -417,7 +417,7 @@ class ScreenDefinition {
                 Object pm = InvokerHelper.createScript(parameterMapNameGroovy, new Binding(ec.context)).run()
                 if (pm && pm instanceof Map) ep.putAll(pm)
             }
-            // logger.info("Expanded response map to url [${url}] to: ${ep}; parameterMapNameGroovy=[${parameterMapNameGroovy}]")
+           logger.info("Expanded response map to url [${url}] to: ${ep}; parameterMapNameGroovy=[${parameterMapNameGroovy}]")
             return ep
         }
     }
