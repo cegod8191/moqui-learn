@@ -1,8 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-1.1.xsd"
-        standalone="false">
- 	<widgets>
- 		<menu name="aaa"/>
- 	</widgets>
+        xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-1.2.xsd"
+        default-menu-include="false"
+        standalone="true">
+
+    <transition name="test_1">
+        <default-response url="."></default-response>
+    </transition>
+    <transition name="test_2">
+        <default-response url="."></default-response>
+    </transition>
+    <widgets>
+         <menu name="tutorial_menu" title="测试2" down-arrow="true">
+             <menu-item name="item1" click="alert('')" />
+             <menu-item style="divider" />
+             <menu-item name="item2" transition="test_2"/>
+             <menu-item name="item3" />
+         </menu>
+     </widgets>
 </screen>

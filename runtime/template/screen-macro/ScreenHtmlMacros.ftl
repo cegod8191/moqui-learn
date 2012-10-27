@@ -487,13 +487,22 @@ This Work includes contributions authored by David E. Jones, not as a
 <#-- datatables -->
 <#macro renderDataTables formNode>
 	<#assign curUrlInfo = sri.getCurrentScreenUrl()>
+    <#assign urlWithParams = sri.screenUrlInfo.getUrlWithParams()>
+    <#assign parameterMap = sri.screenUrlInfo.getParameterMap()?if_exists>
 	<#assign selectMode = (render_data.selectMode)?if_exists>
     <#assign toolbar = (render_data.toolbar)?if_exists>
-	<#if selectMode == 'multi'>
+    <#assign serverSide = (render_data.serverSide)?default(true)>
+    <#assign pageSize = (render_data.pageSize)?if_exists>
+    <#if selectMode == 'multi'>
 	<#else>
 	</#if>
 	<#-- var toolbar_div = $('#${formNode["@name"]}-table_length').next(); -->
     <form id="${formNode["@name"]}-form" action="${urlInfo.url}" method="post">
+    <#if parameterMap?has_content>
+        <#list (parameterMap.keySet())?if_exists as key>
+            <input type="hidden" name="${key}" value="${parameterMap.get(key)}">
+        </#list>
+    </#if>
 	<table id="${formNode["@name"]}" class="table table-bordered"<#if toolbar?has_content> toolbar="${toolbar}"</#if><#if selectMode?has_content> selectMode="${selectMode}"</#if>>
 		<thead>
 			<tr>
@@ -591,15 +600,17 @@ This Work includes contributions authored by David E. Jones, not as a
 			window.${formNode["@name"]} = $('#${formNode["@name"]}-form');
 		    window.${formNode["@name"]}Table = $('#${formNode["@name"]}').dataTable( {
 		        "bProcessing": true,
-		        "bServerSide": true,
-				"bFilter": false, //搜索栏
+		        "bServerSide": <#if serverSide>true<#else>false</#if>,
+                <#if serverSide>
+                "sAjaxSource": "${curUrlInfo.url}",
+                </#if>
+                "bFilter": false, //搜索栏
 				//"bSort": false,
 				"aaSortingFixed": null,
 				// "aoColumnDefs": [
 				// 					{ "bSortable": false, "aTargets": [ 0 ] }
 				// 				],
 				"aaSorting": [],
-		        "sAjaxSource": "${curUrlInfo.url}",
                 "fnServerData": function ( sSource, aoData, fnCallback, oSettings ) {
                     oSettings.jqXHR = $.ajax( {
                         "type": "POST",
@@ -617,6 +628,7 @@ This Work includes contributions authored by David E. Jones, not as a
                    "sLengthMenu": "每页最多_MENU_条",
                    "sZeroRecords": "对不起，查询不到任何相关数据",  
                    "sInfo": "第_START_~_END_条/共_TOTAL_条,",
+                    "sInfoEmpty": "未找到数据,",
                    "sInfoEmtpy": "找不到相关数据",
                    "sInfoFiltered": "数据表中共为 _MAX_ 条记录)",
                    "sProcessing": "正在加载中...",
@@ -630,10 +642,6 @@ This Work includes contributions authored by David E. Jones, not as a
 					}  
 				},
 				"fnInitComplete": function () {
-		            var that = this;
-		            this.$('tbody tr').hover( function () {
-		                //alert( this.innerHTML );
-		            } );
 		        },
 				"fnServerParams": function ( aoData ) {
 					aoData.push( { "name": "_FORM_", "value":  "${formNode["@name"]}"} );
@@ -701,17 +709,35 @@ This Work includes contributions authored by David E. Jones, not as a
     </#if>
 </#macro>
 
-<#macro check>
+<#--<#macro check>-->
+    <#--<#assign currentValue = sri.getFieldValue(.node?parent?parent, "")>-->
+	<#--<#assign style = .node["@style"]?if_exists>-->
+    <#--<#if !currentValue?has_content><#assign currentValue = .node["@no-current-selected-key"]?if_exists/></#if>-->
+    <#--<#assign id><@fieldId .node/></#assign>-->
+    <#--<#assign curName><@fieldName .node/></#assign>-->
+	<#--<#if .node?parent?node_name == "header-field">-->
+		<#--<input type="checkbox" name="${curName}" value="${currentValue?html}"<#if style?has_content> class="${style}"</#if> />-->
+	<#--<#elseif .node?parent?node_name == "default-field">-->
+		<#--<input type="checkbox" name="${curName}" value="${currentValue?html}"<#if style?has_content> class="${style}"</#if> />-->
+	<#--</#if>-->
+<#--</#macro>-->
+<#macro "check">
+    <#--<#assign options = {"":""}/>-->
+    <#assign options = sri.getFieldOptions(.node)>
     <#assign currentValue = sri.getFieldValue(.node?parent?parent, "")>
-	<#assign style = .node["@style"]?if_exists>
+    <#assign style = .node["@style"]?if_exists>
     <#if !currentValue?has_content><#assign currentValue = .node["@no-current-selected-key"]?if_exists/></#if>
     <#assign id><@fieldId .node/></#assign>
     <#assign curName><@fieldName .node/></#assign>
-	<#if .node?parent?node_name == "header-field">
-		<input type="checkbox" name="${curName}" value="${currentValue?html}"<#if style?has_content> class="${style}"</#if> />
-	<#elseif .node?parent?node_name == "default-field">
-		<input type="checkbox" name="${curName}" value="${currentValue?html}"<#if style?has_content> class="${style}"</#if> />
-	</#if>
+    <#if options?has_content>
+    <#list (options.keySet())?if_exists as key>
+        <#assign allChecked = ec.resource.evaluateStringExpand(.node["@all-checked"]?if_exists, "")>
+        <input id="${id}<#if (key_index > 0)>_${key_index}</#if>" type="checkbox" name="${curName}" value="${key?html}"<#if allChecked?if_exists == "true"> checked="checked"<#elseif currentValue?has_content && currentValue==key> checked="checked"</#if><#if .node?parent["@tooltip"]?has_content> title="${.node?parent["@tooltip"]}"</#if>>
+        <#t>${options.get(key)?default("")}
+    </#list>
+    <#else>
+        <input type="checkbox" name="${curName}" value="${currentValue?html}"<#if style?has_content> class="${style}"</#if>/>
+    </#if>
 </#macro>
 
 <#macro formListHeaderField fieldNode>
@@ -876,7 +902,7 @@ This Work includes contributions authored by David E. Jones, not as a
 
 <#-- =================================== 菜单 ============================= -->
 <#macro menu>
-	<#assign name = .node["@name"]>
+	<#assign name = .node["@name"]?if_exists>
 	<#assign style = .node["@style"]?default("nav")>
 	<#assign title = .node["@title"]?if_exists>
 	<#assign downArrow = .node["@down-arrow"]?default("true")>
@@ -907,7 +933,7 @@ This Work includes contributions authored by David E. Jones, not as a
 </#macro>
 
 <#macro "menu-item">
-	<#assign name = .node["@name"]>
+	<#assign name = .node["@name"]?if_exists>
 	<#assign transition = .node["@transition"]?if_exists>
 	<#if transition?has_content>
 		<#assign urlInfo = sri.makeUrlByType(transition, "transition", null)>
@@ -922,10 +948,9 @@ This Work includes contributions authored by David E. Jones, not as a
 		</li>
 	<#else>
 	    <li<#if style?has_content> class="${style}"</#if>>
-			<#if transition?has_content || click?has_content>
-				<a tabindex="-1" href="${urlInfo.url}"<#if click?has_content> onclick="${click?html};return false;"</#if>><#if title?has_content>${title}<#else>${name}</#if></a>
-				<#-- <a tabindex="-1" href="<#if click?has_content>javascript:${click?html};return false;<#else>${urlInfo.url}</#if>"><#if title?has_content>${title}<#else>${name}</#if></a> -->
-			</#if>
+            <#if name?has_content>
+				<a href="<#if urlInfo?has_content>${urlInfo.url}<#else>#</#if>"<#if click?has_content> onclick="${click?html};return false;"</#if>><#if title?has_content>${title}<#else>${name}</#if></a>
+            </#if>
 		</li>
 	</#if>
 </#macro>
@@ -1002,4 +1027,61 @@ This Work includes contributions authored by David E. Jones, not as a
         <#t> class="btn<#if fieldStyle?has_content> ${fieldStyle}</#if>"
         <#t><#if click?has_content> onclick="${click}"</#if>
         <#t>><#recurse></button>
+</#macro>
+
+
+<#macro "state-machine">
+    <#assign name = .node["@name"]>
+    <#assign width = .node["@width"]>
+    <#assign height = .node["@height"]>
+    <#assign location = .node["@location"]>
+    <#assign xmlNode = Static["org.moqui.addons.statemachine.XmlStateMachine"].buildDocument(ec, location)>
+    <#assign start = xmlNode["@initialstate"] >
+    <#assign urlInfo = sri.makeUrlByType(.node["@transition"], "transition", null)>
+
+    <div id="sm-${name}"></div>
+
+    <script type="text/javascript">
+
+    require(['statemachine'], function(){
+        var statemachine = new StateMachine('${name}');
+        statemachine.setStartStateId('${start}');
+        statemachine.setUrl('${urlInfo.url}');
+        statemachine.setLocation('${location}');
+
+        statemachine.createPaper(${width}, ${height});
+
+        <#list xmlNode["state"] as stateNode>
+            <#assign id = stateNode["@id"]>
+            <#assign position = stateNode["position"][0]>
+            <#assign label = stateNode["@label"]?if_exists>
+            <#assign transitions = stateNode["transition"]?if_exists>
+
+            <#if stateNode["@final"]?if_exists == "true">
+                statemachine.setEndStateId('${id}');
+            </#if>
+
+            statemachine.createState('${id}', { position: {x: ${position["@x"]}, y: ${position["@y"]}}, label: "${label}" });
+
+            <#if transitions?has_content>
+                <#list transitions as transition>
+                    <#assign event = transition["@event"]?if_exists>
+                    <#assign label = transition["@label"]?if_exists>
+                    <#assign target = transition["@target"]>
+                    statemachine.createTransition('${id}', {
+                        event: <#if event?has_content>'${event}'<#else>null</#if>
+                        , target: '${target}'
+                        , label: '${label}'
+                    });
+                </#list>
+            </#if>
+        </#list>
+
+        statemachine.drawJoints();
+
+        window.${name} = statemachine;
+    })
+
+
+</script>
 </#macro>

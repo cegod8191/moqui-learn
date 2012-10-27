@@ -214,7 +214,11 @@ $.fn.dataTableExt.oApi.fnAjaxUpdateDraw = function ( oSettings, html )
 
     oSettings.aiDisplay = oSettings.aiDisplayMaster.slice();
 
-    $(oSettings.nTBody).html(html.substring(pos + 1));
+    var body_html = html.substring(pos + 1);
+    if (body_html == null || body_html.trim() == ''){
+        body_html = '<tr><td colspan="100" style="text-align: center">未找到数据</td></tr>';
+    }
+    $(oSettings.nTBody).html(body_html);
 
     oSettings.bAjaxDataGet = false;
     //this._fnDraw( oSettings );
@@ -240,8 +244,6 @@ $.fn.dataTableExt.oApi.fnAjaxUpdateDraw = function ( oSettings, html )
 
     this._fnProcessingDisplay( oSettings, false );
 };
-
-
 
 
 
@@ -275,20 +277,60 @@ function convertDataTablesParameters(params, form){
 		//params = form_data;
 		//alert(params);
 	}
+    //附加当前url查询参数
+    var qs = (function(a) {
+        if (a == "") return {};
+        var b = {};
+        for (var i = 0; i < a.length; ++i)
+        {
+            var p=a[i].split('=');
+            if (p.length != 2) continue;
+            b[p[0]] = decodeURIComponent(p[1].replace(/\+/g, " "));
+        }
+        return b;
+    })(window.location.search.substr(1).split('&'));
+
+    for(var q in qs){
+        params.push({name: q, value: qs[q]});
+    }
 }
 
+function validchecked(button, checked_count){
+    var validchecked = $(button).attr('validchecked');
+    if (validchecked){
+        if (validchecked == 'have' && checked_count > 0){
+            $(button).attr('disabled', false);
+        }
+        else if (validchecked == checked_count){
+            $(button).attr('disabled', false);
+        }
+        else{
+            $(button).attr('disabled', true);
+        }
+    }
+}
+
+
 function dataTablesSelectAll(table_id){
-	$('#' + table_id + ' input[name=checkbox]').each(function(i, checkbox){
+    var $table = $('#' + table_id);
+    var checked_count = 0;
+    $('#' + table_id + ' input[type=checkbox]').each(function(i, checkbox){
 		checkbox.checked = true;
 		$(checkbox).parents('tr').addClass('row_selected');
+        checked_count ++;
 	});
+    $table.data('checked_count', checked_count);
+    var toolbar = $table.attr('toolbar');
+    $('#' + toolbar).find('button').each(function(i, button){
+        validchecked(button, checked_count);
+    });
 }
 
 function dataTablesReverseSelect(table_id){
     var $table = $('#' + table_id);
     var checked_count = $table.data('checked_count');
     if (checked_count == null) checked_count = 0;
-    $table.find('input[name=checkbox]').each(function(i, checkbox){
+    $table.find('input[type=checkbox]').each(function(i, checkbox){
 		checkbox.checked = !checkbox.checked;
 		if (checkbox.checked){
             $(checkbox).parents('tr').addClass('row_selected');
@@ -298,19 +340,11 @@ function dataTablesReverseSelect(table_id){
             checked_count --;
             $(checkbox).parents('tr').removeClass('row_selected');
         }
-        $table.data('checked_count', checked_count);
-        var toolbar = $table.attr('toolbar');
-        $('#' + toolbar).find('button').each(function(i, button){
-            var validchecked = $(button).attr('validchecked');
-            if (validchecked){
-                if (validchecked == checked_count){
-                    $(button).removeAttr('disabled');
-                }
-                else{
-                    $(button).attr('disabled', 'disabled');
-                }
-            }
-        });
+    });
+    $table.data('checked_count', checked_count);
+    var toolbar = $table.attr('toolbar');
+    $('#' + toolbar).find('button').each(function(i, button){
+        validchecked(button, checked_count);
     });
 }
 
@@ -394,28 +428,22 @@ $(document).ready(function(){
         $table.data('checked_count', checked_count);
         var toolbar = $table.attr('toolbar');
         $('#' + toolbar).find('button').each(function(i, button){
-            var validchecked = $(button).attr('validchecked');
-            if (validchecked){
-                if (validchecked == checked_count){
-                    $(button).removeAttr('disabled');
-                }
-                else{
-                    $(button).attr('disabled', 'disabled');
-                }
-            }
+            validchecked(button, checked_count);
         });
     });
    
    $('.table tbody td div.dropdown').live('focus', function(){
 	   if ($(this).children('ul.dropdown-menu').length == 0 && !$(this).hasClass('loading')){
 		   $(this).addClass('loading');
+           var name = $(this).attr('name');
 		   $this = $(this);
 		   $.ajax({
-			   url: $(this).attr('transition'),
-			   data: {lastStandalone: 'true', renderMode: 'json'},
-			   success: function(data) {
-				   console.log(data);
-			   }
+			   url: $(this).children('a.dropdown-toggle').attr('href'),
+			   data: {_MENU_NAME_: name, lastStandalone: 'true', renderMode: 'json'},
+			   success: function(html) {
+                   $this.append('<ul role="menu" class="dropdown-menu sub-menu">' +
+                       html + '</ul>');
+               }
 		   }).always(function(){
 			   $this.removeClass('loading');
 		   });

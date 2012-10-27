@@ -1,4 +1,5 @@
 <#include "classpath://template/DefaultScreenMacros.html.ftl"/>
+
 <#macro "render-mode">
 </#macro>
 
@@ -86,7 +87,7 @@ sSortDir_0	asc
 	<#assign formNode = sri.getFtlFormNode(.node["@name"])>
 	<#assign formName = formNode["@name"]>
 	<#if formName != _FORM_>
-		<#return>
+		<#return />
 	</#if>
     <#assign isMulti = formNode["@multi"]?if_exists == "true">
     <#assign isMultiFinalRow = false>
@@ -95,11 +96,11 @@ sSortDir_0	asc
     <#assign urlInfo = sri.makeUrlByType(formNode["@transition"], "transition", null)>
     <#assign isDynamic = formNode["@dynamic"]?if_exists == "true">
 	<#assign listName = formNode["@list"]>
-	<#assign listObject = ec.resource.evaluateContextField(listName, "")>
+	<#assign listObject = ec.resource.evaluateContextField(listName, "")?if_exists>
 	<#assign formListColumnList = formNode["form-list-column"]?if_exists>
 	<#assign sEcho = ec.web.parameters.get("sEcho")?if_exists>
-	<#assign count = context[listName + "Count"]>
-	<#t>{"sEcho": ${sEcho}, "iTotalRecords": ${count}, "iTotalDisplayRecords": ${count} }
+	<#assign count = context[listName + "Count"]?if_exists>
+	<#t>{"sEcho": ${sEcho}, "iTotalRecords": <#if count?has_content>${count}<#else>0</#if>, "iTotalDisplayRecords": <#if count?has_content>${count}<#else>0</#if> }
     <#if formListColumnList?exists && (formListColumnList?size > 0)>
         <#list listObject as listEntry>
             <#assign listEntryIndex = listEntry_index>
@@ -145,7 +146,6 @@ sSortDir_0	asc
     ${sri.safeCloseList(listObject)}<#-- if listObject is an EntityListIterator, close it -->
     ${sri.getAfterFormWriterText()}
     </#if>
-    <#if sri.doBoundaryComments()><!-- END   form-list[@name=${.node["@name"]}] --></#if>
 </#macro>
 
 
@@ -296,3 +296,77 @@ sSortDir_0	asc
 
 <#--<#macro button>-->
 <#--</#macro>-->
+
+<#-- =================================== 菜单 ============================= -->
+<#macro menu>
+    <#assign name = .node["@name"]?if_exists>
+    <#--<#assign parent_node_name = .node?parent?node_name?default()>-->
+    <#assign _MENU_NAME_ = context._MENU_NAME_?if_exists>
+    <#if parent_node_name?if_exists !="menu-item" && _MENU_NAME_?has_content && name != _MENU_NAME_>
+        <#return />
+    </#if>
+    <#assign style = .node["@style"]?default("nav")>
+    <#assign title = .node["@title"]?if_exists>
+    <#assign downArrow = .node["@down-arrow"]?if_exists>
+    <#assign transition = .node["@transition"]?if_exists>
+    <#assign menuItem = .node["menu-item"]?default()>
+    <#if transition?has_content>
+        <#assign urlInfo = sri.makeUrlByType(transition, "transition", null)>
+    </#if>
+    <#if parent_node_name?if_exists !="menu-item" && _MENU_NAME_?has_content>
+        <#recurse />
+        <#return />
+    </#if>
+    <#if parent_node_name?if_exists != "menu-item">
+        <#if menuItem?has_content>
+                <li class="dropdown"<#if hasParent?if_exists> id="menu-${name}""</#if>>
+        <#else>
+        <div class="dropdown"<#if hasParent?if_exists> id="menu-${name}"</#if> name="${name}">
+        </#if>
+        <a href="<#if urlInfo?has_content>${urlInfo.url}<#else>#</#if>" role="button" class="<#if type?if_exists == "button">btn btn-small </#if>dropdown-toggle" data-toggle="dropdown" ><#if title?has_content>${title}<#else>${name}</#if><#if downArrow == "true" && parent_node_name?if_exists != "menu-item"><b class="caret"></b></#if></a>
+    <#else>
+        <a href="<#if urlInfo?has_content>${urlInfo.url}<#else>#</#if>"><#if title?has_content>${title}<#else>${name}</#if><#-- <i class="icon-arrow-right"></i> --><#if downArrow == "true" && parent_node_name?if_exists != "menu-item"><b class="caret"></b></#if></a>
+    </#if>
+    <#if menuItem?has_content>
+        <ul class="dropdown-menu sub-menu" role="menu" aria-labelledby="drop1">
+            <#recurse />
+        </ul>
+    </#if>
+    <#assign parent_node_name = .node?parent?node_name>
+    <#if parent_node_name!="menu-item">
+        <#if menuItem?has_content>
+            </li>
+        <#else>
+        </div>
+        </#if>
+    </#if>
+</#macro>
+
+<#macro "menu-item">
+    <#assign name = .node["@name"]?if_exists>
+    <#assign transition = .node["@transition"]?if_exists>
+    <#if transition?has_content>
+        <#assign urlInfo = sri.makeUrlByType(transition, "transition", null)>
+    </#if>
+    <#assign submenu = .node["menu"][0]?if_exists>
+    <#assign style = .node["@style"]?if_exists>
+    <#assign title = .node["@title"]?if_exists>
+    <#assign click = .node["@click"]?if_exists>
+    <#if submenu?has_content>
+    <li class="dropdown-submenu">
+        <#assign parent_node_name = "menu-item">
+        <#recurse />
+    </li>
+    <#else>
+        <#assign parent_node_name = "">
+        <li<#if style?has_content> class="${style}"</#if>>
+            <#if name?has_content>
+                <#if transition?has_content || click?has_content>
+                    <a href="${urlInfo.url}"<#if click?has_content> onclick="${click?html};return false;"</#if>><#if title?has_content>${title}<#else>${name}</#if></a>
+                <#else>
+                    <a href="#"><#if title?has_content>${title}<#else>${name}</#if></a>
+                </#if>
+            </#if>
+        </li>
+    </#if>
+</#macro>

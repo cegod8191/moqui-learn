@@ -39,12 +39,16 @@
 		<default-response type="none"></default-response>
 	</transition>
 
+    <transition name="menu">
+        <default-response url="../menu"></default-response>
+    </transition>
+
     <actions>
     	<if condition="context.renderMode == 'json'">
 	        <entity-find entity-name="Tutorial" list="tutorialList">
 	            <search-form-inputs/>
 	        </entity-find>
-	         <log level="info" message="===============${context}"/>
+	         <log level="info" message="===============tutorialList:${tutorialList}"/>
     	</if>
     </actions>
  
@@ -119,7 +123,10 @@
             	<default-field><display/></default-field>
             </field>
             <field name="lastUpdatedStamp"><header-field title="最后更新时间" show-order-by="false"></header-field><default-field><display/></default-field></field>
-            <!-- <field name="operateMenu" style="th-operate-menu"><default-field title="操作"><menu transition="menu"/></default-field></field> -->
+            <field name="operateMenu" style="th-operate-menu">
+                <header-field title="操作" show-order-by="false"></header-field>
+                <default-field><menu name="tutorial_menu" transition="menu" title="操作" down-arrow="true"/></default-field>
+            </field>
         </form-list>
         <container style="clearfix"></container>
         <container-dialog id="CreateTutorialDialog" button-text="Create Tutorial" style="btn-primary">
