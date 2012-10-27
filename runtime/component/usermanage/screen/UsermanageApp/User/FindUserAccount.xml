@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-1.2.xsd"
-        default-menu-title="登录账号管理">
+        default-menu-include="false" default-menu-title="登录账号管理">
 
     <transition name="createUserAccount">
-        <service-call name="create#UserAcount"/>
-        <default-response url="."/>
-    </transition>
-
-    <transition name="createUserAccount_test">
-        <service-call name="usermanage.UserAccountServices.create#UserAccount"/>
-        <default-response url="."/>
+        <service-call name="create#UserAccount" out-map="outmap" />
+        <!-- service-call和actions之间只能2选一,优先service-call, 如果service-call存在则actions不会被执行 -->
+        <actions>
+            <log level="info" message="=========== outmap: ${outmap}" />
+        </actions>
+        <default-response url="../EditUserAccount" parameter-map="outmap"/>
     </transition>
 
     <transition name="editUserAccount">
@@ -20,6 +19,7 @@
     <actions>
         <if condition="context.renderMode == 'json'">
             <entity-find entity-name="UserAccount" list="listUserAccount">
+                <econdition field-name="userId" operator="not-equals" value="_NA_"/>
                 <search-form-inputs/>
             </entity-find>
             <log level="info" message="===============${context}"/>
@@ -83,14 +83,12 @@
         <!--<container style="clearfix"></container>-->
         <container-dialog id="CreateUserAccountDialog" button-text="建立新账号" style="btn-primary">
             <form-single name="CreateTutorial" transition="createUserAccount">
-                <auto-fields-entity entity-name="Tutorial" field-type="edit"/>
-                <field name="tutorialId" validate-parameter="aaa" validate-service="tutorial.TutorialServices.respondDataTables">
-                    <default-field>
-                        <text-line />
-                    </default-field>
-                </field>
+                <field name="username"><default-field><text-line /></default-field></field>
+                <field name="currentPassword"><default-field><password maxlength="20"/></default-field></field>
+                <field name="userFullName"><default-field><text-line /></default-field></field>
+                <field name="emailAddress"><default-field><text-line /></default-field></field>
                 <field name="submitButton">
-                    <default-field title="Create"><submit/></default-field>
+                    <default-field title="Create"><submit style="btn-primary"/></default-field>
                 </field>
             </form-single>
         </container-dialog>

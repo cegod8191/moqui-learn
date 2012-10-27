@@ -12,10 +12,11 @@ This Work includes contributions authored by David E. Jones, not as a
 -->
 <screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-1.2.xsd" default-menu-title="工作流">
-
     <!-- 状态机测试 -->
     <transition name="statemachineTest">
         <actions>
+            <condition>
+            </condition>
             <script location="component://tutorial/script/tutorial/stateMachineTest.groovy"></script>
         </actions>
         <default-response type="none"></default-response>
@@ -26,8 +27,8 @@ This Work includes contributions authored by David E. Jones, not as a
         <actions>
             <script>
                 def xsm = new org.moqui.addons.statemachine.XmlStateMachine(ec)
-                xsm.build("component://tutorial/statemachine/sm1.xml")
-                def subject = [id: 10001]
+                xsm.build()
+                def subject = [id: 10001, amount: 10000]
                 if (context.state){
                     subject.state = context.state
                     xsm.transition(context.event, subject)
@@ -41,20 +42,14 @@ This Work includes contributions authored by David E. Jones, not as a
         <default-response type="none"></default-response>
     </transition>
 
-    <actions>
-        <set field="xmlLocation" value="component://tutorial/statemachine/sm1.xml"/>
-        <script location="component://tutorial/script/tutorial/getStateMachineNode.groovy"></script>
-    </actions>
     <widgets>
         <toolbar>
             <button-group>
                 <button style="btn-small" click="" validchecked="1">保存</button>
-                <button id="btn_exec" style="btn-small" click="test_exec()">测试执行</button>
+                <button id="btn_exec" style="btn-small" click="var button=this;sm1.exec({a: 'a'}, function(state){if (state.object == 'EndState') button.disabled = true})">测试执行</button>
             </button-group>
         </toolbar>
 
-        <render-mode>
-            <text type="html" location="component://tutorial/screen/includes/statemachine.ftl"></text>
-        </render-mode>
+        <state-machine name="sm1" location="component://tutorial/statemachine/sm1.xml" width="960" height="200" transition="wfexec"/>
     </widgets>
 </screen>

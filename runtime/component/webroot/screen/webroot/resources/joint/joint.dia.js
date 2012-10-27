@@ -218,7 +218,8 @@ Element.prototype = {
 	};
 	this._opt = {
 	    draggable: true,	// enable dragging?
-	    ghosting: false,		// enable ghosting?
+        //开启代理拖动
+	    ghosting: true,		// enable ghosting?
 	    toolbox: false		// enable toolbox?
 	};
 
@@ -380,6 +381,7 @@ Element.prototype = {
      * @private
      */
     dragger: function(e){
+    this.wholeShape.callback("mouseDown", this.parent, [e]);
 	if (!this.wholeShape._opt.draggable) return;
 	dia._currentDrag = this.wholeShape;
 	if (dia._currentDrag._opt.ghosting){
@@ -818,7 +820,16 @@ Element.prototype = {
      */
     attr: function(){
 	return Raphael.el.attr.apply(this.wrapper, arguments);
-    }
+    },
+    _callbacks: {},
+    registerCallback: function(evt, fnc){
+        this._callbacks[evt] = fnc;
+        return this;
+    },
+    callback: function(fnc, scope, args){
+        this._callbacks[fnc].apply(scope, args);
+        return this;
+    },
 };
 
 

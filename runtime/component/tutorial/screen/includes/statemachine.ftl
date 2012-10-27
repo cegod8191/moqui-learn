@@ -20,7 +20,7 @@ function test_exec(){
     var event_name;
     if (currnt_state){
         if (state_machine[currnt_state].transitions && state_machine[currnt_state].transitions.length > 0){
-            if(state_machine[currnt_state].object == "EndState")
+            if(state_machine[currnt_state].object != "EndState")
             event_name = state_machine[currnt_state].transitions[0].event;
         }
     }
@@ -41,9 +41,21 @@ function test_exec(){
     })
 }
 
+
+function state_click(e){
+    console.log(this + '||' + e)
+}
+
+function conn_click(e){
+    console.log(this + '||' + e)
+}
+
 $(document).ready(function(){
     var fsa = Joint.dia.fsa;
     Joint.paper("myfsa", 960, 200);
+    fsa.arrow.attrs["stroke"] = '#999';
+    fsa.arrow.attrs["stroke-width"] = 1;
+
 
     var all_state_array = [];
     <#list xmlNode["state"] as stateNode>
@@ -77,11 +89,17 @@ $(document).ready(function(){
 
     for(var state_id in state_machine){
         var state = state_machine[state_id];
+        state.wrapper.click(state_click);
+        if (state.inner.length > 0){
+            state.inner[0].click(state_click);
+        }
         if (state.transitions){
             for(var i = 0; i < state.transitions.length; i ++){
                 var transition = state.transitions[i];
                 fsa.arrow.label = transition.label;
-                state.joint(state_machine[transition.target], fsa.arrow).register(all_state_array);
+                var conn = state.joint(state_machine[transition.target], fsa.arrow).register(all_state_array);
+                conn.registerCallback("connectionMouseDown", conn_click);
+                conn.registerCallback("labelTextClick", conn_click);
             }
         }
     }

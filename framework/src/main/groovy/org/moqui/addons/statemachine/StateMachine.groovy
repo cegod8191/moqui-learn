@@ -11,7 +11,7 @@ class StateMachine {
         }
         def event_has_exists = false
         def transition = state_machine[subject.state].find {
-            if (it instanceof Map && (event == null || it.event == event)){
+            if (it instanceof Map && it.event == event){
                 event_has_exists = true
                 !it.cond || it.cond(subject)
             }

@@ -627,17 +627,21 @@ Joint.prototype = {
 			   e.stopPropagation();
 			   e.preventDefault();
 	});
-        var i;
-        i = this.dom.connection.length;
-        while (i--) {
-	    this.dom.connection[i].mousedown(function(e){
-                Joint.fixEvent(e);
-		self.connectionMouseDown(e);
-		e.stopPropagation();
-		e.preventDefault();
-            });
-        }
-	if (this._opt.handle.start.enabled){
+    var i;
+    i = this.dom.connection.length;
+    while (i--) {
+        this.dom.connection[i].mousedown(function(e){
+            Joint.fixEvent(e);
+            //通知连接线mousedown事件
+            self.callback("connectionMouseDown", self, [e]);
+            //self.connectionMouseDown(e);
+            e.stopPropagation();
+            e.preventDefault();
+        });
+    }
+    //取消连接线折线功能
+    return this;
+    if (this._opt.handle.start.enabled){
 	    this.dom.handleStart.mousedown(function(e){
 			       Joint.fixEvent(e);
 			       self.capMouseDown(e, self.dom.startCap);
@@ -654,18 +658,18 @@ Joint.prototype = {
 	    });
 	}
 	if (this._opt.handle.timeout !== Infinity){
-            i = this.dom.connection.length;
-            while (i--) {
-	       this.dom.connection[i].mouseover(function(e){
-	           Joint.fixEvent(e);
-		   self.showHandle();
-	           setTimeout(function(){
-		       self.hideHandle();
-		   }, self._opt.handle.timeout);
-		   e.stopPropagation();
-		   e.preventDefault();
-	        });
-            }
+        i = this.dom.connection.length;
+        while (i--) {
+            this.dom.connection[i].mouseover(function(e){
+               Joint.fixEvent(e);
+               self.showHandle();
+                   setTimeout(function(){
+                   self.hideHandle();
+               }, self._opt.handle.timeout);
+               e.stopPropagation();
+               e.preventDefault();
+            });
+        }
 	}
 	return this;
     },
@@ -822,7 +826,18 @@ Joint.prototype = {
 	for (var i = 0; i < l; i++){
 	    component = components[i];
 	    this.dom[component] = dom[component]();
-	}
+        //增加连接线label click回调事件
+        if (component == 'label'){
+            var label = this.dom[component];
+            if (label && label.length > 1){
+                var self = this;
+                var text = label[0];
+                text.click(function(e){
+                    self.callback("labelTextClick", this, [e]);
+                });
+            }
+        }
+    }
     },
     /**
      * Clean operations.
