@@ -25,4 +25,11 @@ This Work includes contributions authored by David E. Jones, not as a
     <moqui.basic.LocalizedMessage original="Empty" locale="zh" localized="空"/>
     <moqui.basic.LocalizedMessage original="From" locale="zh" localized="从"/>
     <moqui.basic.LocalizedMessage original="Through" locale="zh" localized="到"/>
+
+    <moqui.basic.LocalizedMessage original="Locale" locale="zh" localized="语言"/>
+    <moqui.basic.LocalizedMessage original="Y" locale="zh" localized="是"/>
+    <moqui.basic.LocalizedMessage original="N" locale="zh" localized="否"/>
+
+    <moqui.basic.LocalizedMessage original="From Date" locale="zh" localized="生效时间"/>
+    <moqui.basic.LocalizedMessage original="Thru Date" locale="zh" localized="截止时间"/>
 </entity-facade-xml>

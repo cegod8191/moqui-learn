@@ -2,9 +2,9 @@
 <screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-1.2.xsd"
         include-child-content="true">
-    <subscreens default-item="FindUsers">
+    <subscreens default-item="User">
     </subscreens>
     <widgets>
-        <subscreens-panel id="usermanage-app" type="tab"/>
+        <subscreens-panel id="usermanage-app" type="popup" title="用户管理"/>
     </widgets>
 </screen>

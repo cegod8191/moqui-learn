@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<services xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/service-definition-1.2.xsd">
+    <service verb="updateUserMemberGroup" type="script"
+             location="component://usermanage/script/usermanage/user/updateUserMemberGroup.groovy">
+         <in-parameters>
+
+         </in-parameters>
+         <out-parameters>
+             <parameter name="count" />
+         </out-parameters>
+     </service>
+</services>

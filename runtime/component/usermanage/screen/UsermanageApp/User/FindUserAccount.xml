@@ -22,14 +22,21 @@
                 <econdition field-name="userId" operator="not-equals" value="_NA_"/>
                 <search-form-inputs/>
             </entity-find>
-            <log level="info" message="===============${context}"/>
-            <log level="info" message="中文" />
         </if>
-        <script>hide = ec.user.hasPermission("perminssion_id_test")</script>
-        <log level="info" message="=============== hide: ${hide}"/>
     </actions>
 
     <widgets>
+        <container-dialog id="CreateUserAccountDialog" button-text="建立新账号" style="btn-primary">
+            <form-single name="CreateUserAccount" transition="createUserAccount">
+                <field name="username"><default-field><text-line /></default-field></field>
+                <field name="currentPassword"><default-field><password maxlength="20"/></default-field></field>
+                <field name="userFullName"><default-field><text-line /></default-field></field>
+                <field name="emailAddress"><default-field><text-line /></default-field></field>
+                <field name="submitButton">
+                    <default-field title="Create"><submit style="btn-primary"/></default-field>
+                </field>
+            </form-single>
+        </container-dialog>
 
         <form-single name="FindUserAccount">
             <!-- <field name="tutorialId"><default-field><text-find/></default-field></field>
@@ -52,7 +59,8 @@
                 <button style="btn-small" click="ListUserAccount.submit()" validchecked="1">修改</button>
             </button-group>
         </toolbar>
-        <form-list name="ListUserAccount" list="listUserAccount" render="{'type':'dataTables', 'selectMode':'single', 'toolbar': 'toolbarUserAccount'}">
+        <form-list name="ListUserAccount" list="listUserAccount"
+                   render="{'type':'dataTables', 'selectMode':'single', 'toolbar': 'toolbarUserAccount', 'serverSide': true}">
             <row-actions>
                 <set field="checkbox" from="userId"/>
 
@@ -66,7 +74,7 @@
                 <!--<default-field><display></display></default-field>-->
             <!--</field>-->
             <field name="username">
-                <default-field><link url="editUserAccount" text="${username}"/></default-field>
+                <default-field><link url="editUserAccount" text="${username}" style="btn-small"/></default-field>
             </field>
             <field name="emailAddress">
                 <default-field><display /></default-field>
@@ -78,19 +86,11 @@
                 <default-field><display></display></default-field>
             </field>
             <field name="lastUpdatedStamp" hide="true"><default-field><display/></default-field></field>
-            <!-- <field name="operateMenu" style="th-operate-menu"><default-field title="操作"><menu transition="menu"/></default-field></field> -->
+            <!--<field name="operateMenu" style="th-operate-menu">-->
+                <!--<header-field title="操作" show-order-by="false"></header-field>-->
+                <!--<default-field><menu transition="menu"/></default-field>-->
+            <!--</field>-->
         </form-list>
         <!--<container style="clearfix"></container>-->
-        <container-dialog id="CreateUserAccountDialog" button-text="建立新账号" style="btn-primary">
-            <form-single name="CreateTutorial" transition="createUserAccount">
-                <field name="username"><default-field><text-line /></default-field></field>
-                <field name="currentPassword"><default-field><password maxlength="20"/></default-field></field>
-                <field name="userFullName"><default-field><text-line /></default-field></field>
-                <field name="emailAddress"><default-field><text-line /></default-field></field>
-                <field name="submitButton">
-                    <default-field title="Create"><submit style="btn-primary"/></default-field>
-                </field>
-            </form-single>
-        </container-dialog>
     </widgets>
 </screen>

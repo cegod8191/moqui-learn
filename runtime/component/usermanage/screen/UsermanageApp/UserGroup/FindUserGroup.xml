@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-1.2.xsd"
+        default-menu-include="false" default-menu-title="登录账号管理">
+
+    <transition name="createUserGroup">
+        <!-- service-call和actions之间只能2选一,优先service-call, 如果service-call存在则actions不会被执行 -->
+        <actions>
+            <service-call name="create#UserGroup" out-map="outmap" />
+            <log level="info" message="=========== outmap: ${outmap}" />
+        </actions>
+        <default-response url="../EditUserGroup" parameter-map="outmap"/>
+    </transition>
+
+    <transition name="editUserGroup">
+        <default-response url="../EditUserGroup"/>
+    </transition>
+
+    <actions>
+        <if condition="context.renderMode == 'json'">
+            <entity-find entity-name="UserGroup" list="listUserGroup">
+                <!--<econdition field-name="userId" operator="not-equals" value="_NA_"/>-->
+                <search-form-inputs/>
+            </entity-find>
+        </if>
+    </actions>
+
+    <widgets>
+
+        <form-single name="FindUserGroup">
+            <!-- <field name="tutorialId"><default-field><text-find/></default-field></field>
+                -->
+            <auto-fields-entity entity-name="UserGroup" field-type="find"/>
+            <field name="searchButton"><default-field title="Find"><submit style="btn-primary" for="ListUserGroup"/></default-field></field>
+        </form-single>
+
+        <toolbar id="toolbarUserGroup">
+            <button-group>
+                <button style="btn-small" click="dataTablesSelectAll('ListUserGroup')">全选</button>
+                <button style="btn-small" click="dataTablesReverseSelect('ListUserGroup')">反选</button>
+            </button-group>
+
+            <button-group>
+                <!--<menu name="test2" title="测试2" down-arrow="true">-->
+                    <!--<menu-item name="item1" transition="createUserGroup"></menu-item>-->
+                    <!--<menu-item name="item2" transition="createUserGroup"></menu-item>-->
+                <!--</menu>-->
+                <button style="btn-small" click="ListUserGroup.submit()" validchecked="1">修改</button>
+            </button-group>
+        </toolbar>
+        <form-list name="ListUserGroup" list="listUserGroup" render="{'type':'dataTables', 'selectMode':'single', 'toolbar': 'toolbarUserGroup'}">
+            <row-actions>
+                <set field="checkbox" from="userGroupId"/>
+            </row-actions>
+            <field name="checkbox" style="th-checkbox">
+                <header-field title="" show-order-by="false"></header-field>
+                <default-field title=""><check></check></default-field>
+            </field>
+            <field name="userGroupId"><default-field><link url="editUserGroup" text="${userGroupId}"/></default-field></field>
+            <field name="description"><default-field>
+                <display/>
+            </default-field></field>
+        </form-list>
+        <!--<container style="clearfix"></container>-->
+        <container-dialog id="CreateUserGroupDialog" button-text="建立新用户组" style="btn-primary">
+            <form-single name="CreateUserGroup" transition="createUserGroup">
+                <field name="description"><default-field><text-line /></default-field></field>
+                <field name="submitButton">
+                    <default-field title="Create"><submit style="btn-primary"/></default-field>
+                </field>
+            </form-single>
+        </container-dialog>
+    </widgets>
+</screen>
