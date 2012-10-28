@@ -452,11 +452,6 @@ ${sri.renderIncludeScreen(.node["@location"], .node["@share-scope"]?if_exists)}
     <#assign listName = formNode["@list"]>
     <#assign listObject = ec.resource.evaluateContextField(listName, "")>
     <#assign formListColumnList = formNode["form-list-column"]?if_exists>
-    <#assign render = formNode["@render"]?if_exists>
-    <#if render?has_content>
-        <#assign render_data = render?eval />
-        <#assign type = (render_data.type)?if_exists>
-    </#if>
     <#if !(formNode["@paginate"]?if_exists == "false") && context[listName + "Count"]?exists && (context[listName + "Count"]?if_exists > 0)>
         <div class="form-list-paginate">
             <#if (context[listName + "PageIndex"] > 0)>
@@ -569,9 +564,6 @@ ${sri.renderIncludeScreen(.node["@location"], .node["@share-scope"]?if_exists)}
         </div><!-- close table -->
         ${sri.getAfterFormWriterText()}
     <#else>
-        <#if type?has_content && type == "dataTables">
-            <@renderDataTables formNode />
-        <#else>
         <div class="form-list-outer" id="${formNode["@name"]}-table">
             <div class="form-header-group">
                 <#assign needHeaderForm = sri.isFormHeaderForm(formNode["@name"])>
@@ -641,7 +633,6 @@ ${sri.renderIncludeScreen(.node["@location"], .node["@share-scope"]?if_exists)}
             </#if>
             ${sri.safeCloseList(listObject)}<#-- if listObject is an EntityListIterator, close it -->
         </div>
-        </#if>
         ${sri.getAfterFormWriterText()}
     </#if>
 <#if sri.doBoundaryComments()><!-- END   form-list[@name=${.node["@name"]}] --></#if>
