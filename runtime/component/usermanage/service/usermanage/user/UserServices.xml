@@ -1,13 +1,70 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <services xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/service-definition-1.2.xsd">
-    <service verb="updateUserMemberGroup" type="script"
-             location="component://usermanage/script/usermanage/user/updateUserMemberGroup.groovy">
-         <in-parameters>
+    <service verb="updateUserMemberGroup" type="inline">
+        <in-parameters>
+            <parameter name="checkedUserGroupId" />
+            <parameter name="userGroupId" />
+            <parameter name="fromDate" />
+            <parameter name="thruDate" />
+        </in-parameters>
+        <out-parameters>
+        </out-parameters>
+        <actions>
+            <entity-find-one entity-name="UserGroupMember" value-field="foundUserGroupMember">
+                <field-map field-name="userId" from="context.userId"/>
+                <field-map field-name="userGroupId" from="context.userGroupId"/>
+            </entity-find-one>
+            <!-- 如果不存在且选中状态,则新增记录 -->
+            <if condition="foundUserGroupMember==null">
+                <if condition="context.checkedUserGroupId!=null">
+                    <entity-make-value entity-name="UserGroupMember" value-field="newUserGroupMember" map="context" />
+                    <set field="newUserGroupMember.fromDate" value="2010-02-03 00:00:00.0"/>
+                    <entity-create value-field="newUserGroupMember" />
+                </if>
+            <else>
+                <!-- 如果原记录存在且未选中状态,则删除记录 -->
+                <if condition="context.checkedUserGroupId==null">
+                    <entity-delete value-field="foundUserGroupMember" />
+                <else>
+                    <!-- 如果记录存在且起始时间有变化,则先删除再新增 -->
+                    <if condition="foundUserGroupMember.fromDate.toString() != context.fromDate">
+                    <!--<compare field="foundUserGroupMember.fromDate" operator="not-equals" value="${context.fromDate}">-->
+                        <entity-delete value-field="foundUserGroupMember" />
+                        <entity-make-value entity-name="UserGroupMember" value-field="newUserGroupMember" map="context" />
+                        <entity-create value-field="newUserGroupMember" />
+                    <else>
+                        <!-- 如果是空字符串则转化为null,便于更数据库null值进行比较 -->
+                        <if condition="context.thruDate == ''">
+                            <set field="context.thruDate" from="null"/>
+                        </if>
+                        <if condition="foundUserGroupMember.thruDate != context.thruDate">
+                            <entity-set value-field="foundUserGroupMember" map="context"/>
+                            <entity-update value-field="foundUserGroupMember"/>
+                        </if>
+                    </else>
+                    </if>
+                </else>
+                </if>
+            </else>
+            </if>
+        </actions>
+    </service>
 
-         </in-parameters>
-         <out-parameters>
-             <parameter name="count" />
-         </out-parameters>
-     </service>
+    <service verb="updateGroupMember" type="inline">
+        <in-parameters>
+            <parameter name="userId" />
+            <parameter name="username"/>
+            <parameter name="fromDate" />
+            <parameter name="thruDate" />
+        </in-parameters>
+        <out-parameters>
+        </out-parameters>
+        <actions>
+            <entity-find-one entity-name="UserGroupMember" value-field="foundMember">
+                <field-map field-name="userGroupId" from="context.userGroupId"/>
+                <field-map field-name="userId" from="context.userId"/>
+            </entity-find-one>
+        </actions>
+    </service>
 </services>

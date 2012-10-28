@@ -19,7 +19,7 @@
     <actions>
         <if condition="context.renderMode == 'json'">
             <entity-find entity-name="UserGroup" list="listUserGroup">
-                <!--<econdition field-name="userId" operator="not-equals" value="_NA_"/>-->
+                <econdition field-name="userGroupId" operator="not-equals" value="ALL_USERS"/>
                 <search-form-inputs/>
             </entity-find>
         </if>

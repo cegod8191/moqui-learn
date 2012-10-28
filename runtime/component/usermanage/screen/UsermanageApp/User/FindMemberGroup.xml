@@ -23,32 +23,37 @@
     </actions>
 
     <widgets>
+        <!--<nav style="nav-pills" trigger="hover">-->
+            <!--<menu name="menu1" title="测试">-->
+                <!--<menu-item name="menu2" title="updateUserMemberGroup" transition="updateUserMemberGroup"></menu-item>-->
+            <!--</menu>-->
+        <!--</nav>-->
         <toolbar id="toolbarUserGroupMember">
             <button-group>
-                <button style="btn-small" click="dataTablesSelectAll('listGroup')">全选</button>
-                <button style="btn-small" click="dataTablesReverseSelect('listGroup')">反选</button>
+                <button style="btn-small" click="dataTablesSelectAll('ListGroup')">全选</button>
+                <button style="btn-small" click="dataTablesReverseSelect('ListGroup')">反选</button>
             </button-group>
 
             <button-group>
-                <button style="btn-small btn-primary" click="listGroup.submit()">保存</button>
+                <button id="buttonSave" style="btn-small btn-primary" click="ListGroup.submit()" tooltip="打勾选择所属组,然后点保存">保存</button>
             </button-group>
         </toolbar>
-        <form-list name="listGroup" list="listGroup" transition="updateUserMemberGroup" multi="true"
+        <form-list name="ListGroup" list="listGroup" transition="updateUserMemberGroup" multi="true"
             render="{'type':'dataTables', 'selectMode':'multi', 'toolbar': 'toolbarUserGroupMember', 'serverSide': false, 'pageSize': 100}">
             <row-actions>
-                <set field="checkbox" from="userGroupId"/>
                 <entity-find-one entity-name="UserGroupMember" value-field="userGroupMember">
                     <field-map field-name="userId" />
                     <field-map field-name="userGroupId" from="userGroupId" />
                 </entity-find-one>
-                <set field="foundUserGroupId" from="userGroupMember?userGroupMember.userGroupId:''"/>
+                <set field="checkedUserGroupId" from="userGroupMember?userGroupMember.userGroupId:''"/>
                 <set field="fromDate" from="userGroupMember?userGroupMember.fromDate:''"/>
                 <set field="thruDate" from="userGroupMember?userGroupMember.thruDate:''"/>
             </row-actions>
-            <field name="checkbox" style="th-checkbox">
+            <field name="checkedUserGroupId" style="th-checkbox">
                 <header-field title="" show-order-by="false"></header-field>
-                <default-field title=""><check><option key="${foundUserGroupId}" text=" "/></check></default-field>
+                <default-field title=""><check><option key="${checkedUserGroupId}" text=" "/></check></default-field>
             </field>
+            <field name="userGroupId" hide=""><default-field title="用户组编号"><display/></default-field></field>
             <field name="description"><default-field title="用户组"><display/></default-field></field>
             <field name="fromDate"><default-field><date-time /></default-field></field>
             <field name="thruDate"><default-field><date-time /></default-field></field>

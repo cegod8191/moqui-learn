@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns=""
+        xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-1.2.xsd"
+        default-menu-title="用户组成员" default-menu-index="2">
+    <!-- tab页上面的参数 -->
+    <parameter name="userGroupId"/>
+
+    <transition name="createGroupMember">
+        <service-call name="create#UserAccount"/>
+        <default-response url="."/>
+    </transition>
+
+    <transition name="updateGroupMember">
+        <service-call name="usermanage.user.UserServices.updateGroupMember"/>
+        <default-response url="."/>
+    </transition>
+
+    <actions>
+        <entity-find entity-name="UserGroupMember" list="listGroupMember">
+            <select-field field-name="userId" />
+            <econdition field-name="userGroupId" />
+        </entity-find>
+        <!-- 在未用<search-form-inputs/>的情况下,需要entity-find-count,否则取不到总记录数,模板"count = context[listName + "Count"]"会报错 -->
+        <!-- count变量命名规则必须未list名+Count -->
+        <entity-find-count entity-name="UserGroupMember" count-field="listGroupMemberCount">
+            <econdition field-name="userGroupId" />
+        </entity-find-count>
+    </actions>
+
+    <widgets>
+        <!--<nav style="nav-pills" trigger="hover">-->
+            <!--<menu name="menu1" title="测试">-->
+                <!--<menu-item name="menu2" title="updateUserMemberGroup" transition="updateUserMemberGroup"></menu-item>-->
+            <!--</menu>-->
+        <!--</nav>-->
+        <toolbar id="toolbarUserGroupMember">
+            <button-group>
+                <button style="btn-small" click="dataTablesSelectAll('ListGroupMember')">全选</button>
+                <button style="btn-small" click="dataTablesReverseSelect('ListGroupMember')">反选</button>
+            </button-group>
+
+            <button-group>
+                <button id="buttonDelete" style="btn-small" click="ListGroupMember.submit()" validchecked="have">删除所选用户</button>
+            </button-group>
+            <button-group>
+                <button id="buttonSave" style="btn-small btn-primary" click="ListGroupMember.submit()">新增用户</button>
+            </button-group>
+        </toolbar>
+        <form-list name="ListGroupMember" list="listGroupMember" transition="updateGroupMember" multi="true"
+            render="{'type':'dataTables', 'selectMode':'multi', 'toolbar': 'toolbarUserGroupMember', 'serverSide': true, 'pageSize': 100}">
+            <row-actions>
+                <entity-find-one entity-name="UserAccount" value-field="userAccount">
+                    <field-map field-name="userId" />
+                    <select-field field-name="username" />
+                    <select-field field-name="userFullName" />
+                </entity-find-one>
+            </row-actions>
+            <field name="userId" style="th-checkbox">
+                <header-field title="" show-order-by="false"></header-field>
+                <default-field title=""><check></check></default-field>
+            </field>
+            <field name="username" hide=""><default-field title="用户名"><display text="${userAccount.username}"/></default-field></field>
+            <field name="userFullName" hide=""><default-field title="用户姓名"><display text="${userAccount.userFullName}"/></default-field></field>
+            <field name="fromDate"><default-field><date-time /></default-field></field>
+            <field name="thruDate"><default-field><date-time /></default-field></field>
+        </form-list>
+    </widgets>
+</screen>

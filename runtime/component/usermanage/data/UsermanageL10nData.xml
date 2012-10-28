@@ -17,6 +17,8 @@ This Work includes contributions authored by David E. Jones, not as a
     <moqui.basic.LocalizedMessage original="User Full Name" locale="zh" localized="姓名"/>
     <moqui.basic.LocalizedMessage original="Disabled" locale="zh" localized="失效"/>
     <moqui.basic.LocalizedMessage original="Last Updated Stamp" locale="zh" localized="最后更新时间"/>
+    <moqui.basic.LocalizedMessage original="User Group ID" locale="zh" localized="用户组编号"/>
+
     <!-- 公共 -->
     <moqui.basic.LocalizedMessage original="Not" locale="zh" localized="不"/>
     <moqui.basic.LocalizedMessage original="Equals" locale="zh" localized="相等"/>
