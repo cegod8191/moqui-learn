@@ -11,7 +11,7 @@
 
     <state id="apply" label="采购申请">
         <position x="120" y="160"/>
-        <transition event="检查额度" target="examine" label="额度超限">
+        <transition event="检查额度" target="examine" label="超1万">
             <condition>
                 <expression>subject.amount&gt;=10000</expression>
                 <!--<compare field="subject.amount" operator="greater-equals" value="10000" type="Integer"/>-->
@@ -20,7 +20,7 @@
                 <log level="info" message="----------------------to examine:${subject.amount}"  />
             </action>
         </transition>
-        <transition event="检查额度" target="end" label="未超额度">
+        <transition event="检查额度" target="end" label="小于1万">
             <condition>
                 <compare field="subject.amount" operator="less-equals" value="10000" type="Integer"/>
             </condition>

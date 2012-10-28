@@ -28,7 +28,7 @@ This Work includes contributions authored by David E. Jones, not as a
             <script>
                 def xsm = new org.moqui.addons.statemachine.XmlStateMachine(ec)
                 xsm.build()
-                def subject = [id: 10001, amount: 10000]
+                def subject = [id: 10001, amount: context.amount.toInteger()]
                 if (context.state){
                     subject.state = context.state
                     xsm.transition(context.event, subject)
@@ -43,10 +43,17 @@ This Work includes contributions authored by David E. Jones, not as a
     </transition>
 
     <widgets>
+        <form-single name="test">
+            <field name="amount">
+                <default-field title="测试额度">
+                    <text-line default-value="10000"/>
+                </default-field>
+            </field>
+        </form-single>
         <toolbar>
             <button-group>
                 <button style="btn-small" click="" validchecked="1">保存</button>
-                <button id="btn_exec" style="btn-small" click="var button=this;sm1.exec({a: 'a'}, function(state){if (state.object == 'EndState') button.disabled = true})">测试执行</button>
+                <button id="btn_exec" style="btn-small" click="var button=this;sm1.exec({amount: $('#test_amount').val()}, function(state){if (state.object == 'EndState') button.disabled = true})">测试执行</button>
             </button-group>
         </toolbar>
 

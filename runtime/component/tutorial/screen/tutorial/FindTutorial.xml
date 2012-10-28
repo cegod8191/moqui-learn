@@ -68,7 +68,7 @@
 			</menu>
 			
 			<menu name="test2" title="测试2" down-arrow="true">
-				<menu-item name="item1" transition="createTutorial_1"></menu-item>
+				<menu-item name="item1" transition="createTutorial_3"></menu-item>
 				<menu-item name="item2" style="divider"></menu-item>
 				<menu-item name="item3">
 					<menu name="submenu">
