@@ -100,6 +100,7 @@ sSortDir_0	asc
 	<#assign formListColumnList = formNode["form-list-column"]?if_exists>
 	<#assign sEcho = ec.web.parameters.get("sEcho")?if_exists>
 	<#assign count = context[listName + "Count"]?if_exists>
+
 	<#t>{"sEcho": ${sEcho}, "iTotalRecords": <#if count?has_content>${count}<#else>0</#if>, "iTotalDisplayRecords": <#if count?has_content>${count}<#else>0</#if> }
     <#if formListColumnList?exists && (formListColumnList?size > 0)>
         <#list listObject as listEntry>
@@ -362,7 +363,7 @@ sSortDir_0	asc
         <li<#if style?has_content> class="${style}"</#if>>
             <#if name?has_content>
                 <#if transition?has_content || click?has_content>
-                    <a href="${urlInfo.url}"<#if click?has_content> onclick="${click?html};return false;"</#if>><#if title?has_content>${title}<#else>${name}</#if></a>
+                    <a href="<#if urlInfo?has_content>${urlInfo.url}<#else>#</#if>"<#if click?has_content> onclick="${click?html};return false;"</#if>><#if title?has_content>${title}<#else>${name}</#if></a>
                 <#else>
                     <a href="#"><#if title?has_content>${title}<#else>${name}</#if></a>
                 </#if>
