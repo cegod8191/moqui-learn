@@ -5,11 +5,6 @@
     <!-- tab页上面的参数 -->
     <parameter name="userGroupId"/>
 
-    <transition name="createGroupMember">
-        <service-call name="create#UserAccount"/>
-        <default-response url="."/>
-    </transition>
-
     <transition name="updateGroupMember">
         <service-call name="usermanage.user.UserServices.updateGroupMember"/>
         <default-response url="."/>
@@ -17,7 +12,6 @@
 
     <actions>
         <entity-find entity-name="UserGroupMember" list="listGroupMember">
-            <select-field field-name="userId" />
             <econdition field-name="userGroupId" />
         </entity-find>
         <!-- 在未用<search-form-inputs/>的情况下,需要entity-find-count,否则取不到总记录数,模板"count = context[listName + "Count"]"会报错 -->

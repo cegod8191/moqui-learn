@@ -59,7 +59,7 @@
                 <button style="btn-small" click="ListUserAccount.submit()" validchecked="1">修改</button>
             </button-group>
         </toolbar>
-        <form-list name="ListUserAccount" list="listUserAccount"
+        <form-list name="ListUserAccount" list="listUserAccount" transition="editUserAccount"
                    render="{'type':'dataTables', 'selectMode':'single', 'toolbar': 'toolbarUserAccount', 'serverSide': true}">
             <row-actions>
                 <set field="checkbox" from="userId"/>

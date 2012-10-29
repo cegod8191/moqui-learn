@@ -39,7 +39,7 @@
                             <set field="context.thruDate" from="null"/>
                         </if>
                         <if condition="foundUserGroupMember.thruDate != context.thruDate">
-                            <entity-set value-field="foundUserGroupMember" map="context"/>
+                            <entity-set value-field="foundUserGroupMember" map="context" set-if-empty="true"/>
                             <entity-update value-field="foundUserGroupMember"/>
                         </if>
                     </else>
