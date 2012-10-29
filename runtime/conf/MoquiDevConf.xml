@@ -6,25 +6,25 @@
     <cache-list>
         <!-- Development Mode - don't use these for production, load testing, etc.
              Cleared by default every 20 seconds from when loaded into cache. -->
-        <cache name="entity.definition" expire-time-idle="3"/>
+        <cache name="entity.definition" expire-time-idle="30"/>
         <!-- longer timeout since this basically looks through all files to check for new or moved entity defs -->
-        <cache name="entity.location" expire-time-idle="30"/>
+        <cache name="entity.location" expire-time-idle="300"/>
 
-        <cache name="service.location" expire-time-idle="2"/>
-        <cache name="service.java.class" expire-time-idle="2"/>
+        <cache name="service.location" expire-time-idle="5"/>
+        <cache name="service.java.class" expire-time-idle="5"/>
 
-        <cache name="screen.location" expire-time-idle="2"/>
-        <cache name="screen.template.mode" expire-time-idle="2"/>
-        <cache name="screen.template.location" expire-time-idle="2"/>
+        <cache name="screen.location" expire-time-idle="5"/>
+        <cache name="screen.template.mode" expire-time-idle="5"/>
+        <cache name="screen.template.location" expire-time-idle="5"/>
 
-        <cache name="resource.xml-actions.location" expire-time-idle="2"/>
-        <cache name="resource.groovy.location" expire-time-idle="2"/>
+        <cache name="resource.xml-actions.location" expire-time-idle="5"/>
+        <cache name="resource.groovy.location" expire-time-idle="5"/>
         <!-- longer timeout because these are cached by the expression text itself, so changed text is a new entry -->
-        <cache name="resource.groovy.expression" expire-time-idle="60"/>
+        <cache name="resource.groovy.expression" expire-time-idle="600"/>
 
-        <cache name="resource.ftl.location" expire-time-idle="2"/>
-        <cache name="resource.cwiki.location" expire-time-idle="2"/>
-        <cache name="resource.text.location" expire-time-idle="2"/>
+        <cache name="resource.ftl.location" expire-time-idle="5"/>
+        <cache name="resource.cwiki.location" expire-time-idle="5"/>
+        <cache name="resource.text.location" expire-time-idle="5"/>
     </cache-list>
     
     <server-stats>
@@ -39,10 +39,7 @@
     </server-stats>
 
     <webapp-list>
-            <!-- NOTE: when you set https-enabled="true" make sure to set the http-port and https-port attributes -->
-            <webapp name="webroot" http-port="" http-host=""
-                https-port="" https-host="" https-enabled="false"
-                content-prefix-secure="" content-prefix-standard="" cookie-domain="">
+        <webapp name="webroot" https-enabled="false">
             <root-screen host=".*" location="component://webroot/screen/webroot.xml"/>
         </webapp>
     </webapp-list>
@@ -81,11 +78,12 @@
     </entity-facade>
 
     <repository-list>
-        <repository name="main" location="http://localhost:8081/jackrabbit/server" type="davex" workspace="development"/>
+        <repository name="main" location="http://localhost:8081/rmi" type="rmi" workspace="default"
+                    username="admin" password="admin"/>
     </repository-list>
     <component-list>
-        <!-- This loads the example component over top of the default one, which will result in a warning but works
+        <!-- This loads the tools component over top of the default one, which will result in a warning but works
             fine. Use something like this to refer to components in a JCR repository. -->
-        <component name="example" location="component/example"/>
+        <component name="tools" location="component/tools"/>
     </component-list>
 </moqui-conf>
