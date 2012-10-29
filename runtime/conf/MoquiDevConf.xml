@@ -56,17 +56,17 @@
     <entity-facade crypt-pass="MoquiDevDefaultPassword:CHANGEME"> 
         <!-- add datasource elements here to configure databases -->
         <datasource group-name="transactional" database-conf-name="mysql" schema-name="moquitransactional">
-            <inline-jdbc jdbc-uri="jdbc:mysql://localhost:8889/moquitransactional?autoReconnect=true&amp;useUnicode=yes&amp;characterEncoding=UTF-8"
+            <inline-jdbc jdbc-uri="jdbc:mysql://localhost:8889/moquitransactional?autoReconnect=true&amp;useUnicode=true&amp;characterEncoding=UTF-8"
 				 jdbc-username="root" jdbc-password="root" pool-minsize="2"
 				 pool-maxsize="50" />
         </datasource>	
         <datasource group-name="analytical" database-conf-name="mysql" schema-name="moquianalytical">
-            <inline-jdbc jdbc-uri="jdbc:mysql://localhost:8889/moquianalytical?autoReconnect=true&amp;useUnicode=yes&amp;characterEncoding=UTF-8"
+            <inline-jdbc jdbc-uri="jdbc:mysql://localhost:8889/moquianalytical?autoReconnect=true&amp;useUnicode=true&amp;characterEncoding=UTF-8"
 				 jdbc-username="root" jdbc-password="root" pool-minsize="2"
 				 pool-maxsize="50" />
         </datasource>	
         <datasource group-name="tenantcommon" database-conf-name="mysql" schema-name="moquitenantcommon">
-            <inline-jdbc jdbc-uri="jdbc:mysql://localhost:8889/moquitenantcommon?autoReconnect=true&amp;useUnicode=yes&amp;characterEncoding=UTF-8"
+            <inline-jdbc jdbc-uri="jdbc:mysql://localhost:8889/moquitenantcommon?autoReconnect=true&amp;useUnicode=true&amp;characterEncoding=UTF-8"
 				 jdbc-username="root" jdbc-password="root" pool-minsize="2"
 				 pool-maxsize="50" />
         </datasource> 
