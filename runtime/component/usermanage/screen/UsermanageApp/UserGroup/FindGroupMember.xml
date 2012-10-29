@@ -5,8 +5,13 @@
     <!-- tab页上面的参数 -->
     <parameter name="userGroupId"/>
 
-    <transition name="updateGroupMember">
-        <service-call name="usermanage.user.UserServices.updateGroupMember"/>
+    <transition name="deleteGroupMember">
+        <service-call name="usermanage.user.UserServices.deleteGroupMember"/>
+        <default-response url="."/>
+    </transition>
+
+    <transition name="addGroupMember">
+        <service-call name="usermanage.user.UserServices.addGroupMember"/>
         <default-response url="."/>
     </transition>
 
@@ -20,6 +25,26 @@
             <econdition field-name="userGroupId" />
         </entity-find-count>
     </actions>
+
+    <transition name="getUserList">
+        <actions>
+            <entity-find entity-name="UserAccount" list="userAccountList" limit="20">
+                <econdition field-name="userId" operator="not-equals" value="_NA_"/>
+                <econditions combine="or">
+                    <econdition field-name="userId" operator="like" value="%${term}%"/>
+                    <econdition field-name="username" operator="like" value="%${term}%" ignore-case="true"/>
+                </econditions>
+                <order-by field-name="username"/>
+            </entity-find>
+            <script>
+                def outList = []
+                for (def userAccount in userAccountList)
+                    outList.add([value:userAccount.userId, label:"${userAccount.username} [${userAccount.userId}]".toString()])
+                ec.web.sendJsonResponse(outList)
+            </script>
+        </actions>
+        <default-response type="none"/>
+    </transition>
 
     <widgets>
         <!--<nav style="nav-pills" trigger="hover">-->
@@ -36,11 +61,24 @@
             <button-group>
                 <button id="buttonDelete" style="btn-small" click="ListGroupMember.submit()" validchecked="have">删除所选用户</button>
             </button-group>
-            <button-group>
-                <button id="buttonSave" style="btn-small btn-primary" click="ListGroupMember.submit()">新增用户</button>
-            </button-group>
+
+            <container-dialog id="AddGroupMemberDialog" button-text="新增用户" style="btn-primary btn-small">
+                <form-single name="AddGroupMember" transition="addGroupMember">
+                    <field name="userId">
+                        <default-field title="用户编号">
+                            <text-line ac-transition="getUserList"/>
+                        </default-field>
+                    </field>
+                    <field name="userGroupId" hide="true"><default-field>
+                        <hidden />
+                    </default-field></field>
+                    <field name="submitButton">
+                        <default-field title="Create"><submit style="btn-primary"/></default-field>
+                    </field>
+                </form-single>
+            </container-dialog>
         </toolbar>
-        <form-list name="ListGroupMember" list="listGroupMember" transition="updateGroupMember" multi="true"
+        <form-list name="ListGroupMember" list="listGroupMember" transition="deleteGroupMember" multi="true"
             render="{'type':'dataTables', 'selectMode':'multi', 'toolbar': 'toolbarUserGroupMember', 'serverSide': true, 'pageSize': 100}">
             <row-actions>
                 <entity-find-one entity-name="UserAccount" value-field="userAccount">

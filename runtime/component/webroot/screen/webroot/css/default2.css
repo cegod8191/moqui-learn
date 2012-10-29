@@ -40,6 +40,11 @@ td.sorting_asc{
 
 .navbar{margin-bottom: 5px;}
 
+/* form样式覆盖 */
+.btn-toolbar {
+    font-size: 1em;
+}
+
 /* ================== bootstrap 下拉菜单hover =============== */
 /* .dropdown-menu .sub-menu {
     left: 100%;

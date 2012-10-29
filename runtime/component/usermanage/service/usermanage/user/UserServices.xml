@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <services xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/service-definition-1.2.xsd">
+    <!-- 更新用户的所属用户组 -->
     <service verb="updateUserMemberGroup" type="inline">
         <in-parameters>
             <parameter name="checkedUserGroupId" />
@@ -19,7 +20,7 @@
             <if condition="foundUserGroupMember==null">
                 <if condition="context.checkedUserGroupId!=null">
                     <entity-make-value entity-name="UserGroupMember" value-field="newUserGroupMember" map="context" />
-                    <set field="newUserGroupMember.fromDate" value="2010-02-03 00:00:00.0"/>
+                    <set field="newUserGroupMember.fromDate" from="ec.user.getNowTimestamp()"/>
                     <entity-create value-field="newUserGroupMember" />
                 </if>
             <else>
@@ -51,20 +52,93 @@
         </actions>
     </service>
 
-    <service verb="updateGroupMember" type="inline">
+    <service verb="addGroupMember" type="inline">
         <in-parameters>
-            <parameter name="userId" />
-            <parameter name="username"/>
-            <parameter name="fromDate" />
-            <parameter name="thruDate" />
+            <parameter name="userId"/>
+            <parameter name="userGroupId"/>
         </in-parameters>
         <out-parameters>
         </out-parameters>
         <actions>
-            <entity-find-one entity-name="UserGroupMember" value-field="foundMember">
-                <field-map field-name="userGroupId" from="context.userGroupId"/>
-                <field-map field-name="userId" from="context.userId"/>
-            </entity-find-one>
+            <if condition="context.userId">
+                <set field="context.fromDate" from="ec.user.getNowTimestamp()"/>
+                <entity-make-value entity-name="UserGroupMember" value-field="newGroupMember" map="context"/>
+                <entity-create value-field="newGroupMember" />
+            </if>
+        </actions>
+    </service>
+
+    <!-- 删除用户组成员 -->
+    <service verb="deleteGroupMember" type="inline">
+        <in-parameters>
+            <parameter name="userId" />
+        </in-parameters>
+        <out-parameters>
+        </out-parameters>
+        <actions>
+            <if condition="context.userId != null">
+                <entity-delete-by-condition entity-name="UserGroupMember">
+                    <econdition field-name="userId" from="context.userId" />
+                </entity-delete-by-condition>
+            </if>
+        </actions>
+    </service>
+
+    <!-- 新增用户组的授权资源id -->
+    <service verb="addGroupPermission" type="inline">
+        <in-parameters>
+            <parameter name="userPermissionId"/>
+            <parameter name="userGroupId"/>
+        </in-parameters>
+        <out-parameters>
+        </out-parameters>
+        <actions>
+            <if condition="context.userPermissionId != null">
+                <set field="context.fromDate" from="ec.user.getNowTimestamp()"/>
+                <entity-make-value entity-name="UserGroupPermission" value-field="newUserGroupPermission" map="context"/>
+                <entity-create value-field="newUserGroupPermission" />
+                <log level="info" message="========= context: ${context}" />
+            </if>
+        </actions>
+    </service>
+
+
+    <!-- 删除用户组相关授权 -->
+    <service verb="deleteGroupPermission" type="inline">
+        <in-parameters>
+            <parameter name="checkbox" />
+            <parameter name="userPermissionId" />
+        </in-parameters>
+        <out-parameters>
+        </out-parameters>
+        <actions>
+            <if condition="context.checkbox != null">
+                <entity-delete-by-condition entity-name="UserGroupPermission">
+                    <econdition field-name="userPermissionId" from="context.userPermissionId" />
+                </entity-delete-by-condition>
+            </if>
+        </actions>
+    </service>
+
+    <!-- 删除或保存授权资源 -->
+    <service verb="saveUserPermission" type="inline">
+        <in-parameters>
+            <parameter name="checkbox" />
+            <parameter name="userPermissionId" />
+            <parameter name="description" />
+        </in-parameters>
+        <out-parameters>
+        </out-parameters>
+        <actions>
+            <if condition="context.checkbox != null">
+                <entity-delete-by-condition entity-name="UserPermission">
+                    <econdition field-name="userPermissionId" from="context.userPermissionId" />
+                </entity-delete-by-condition>
+            <else>
+                <entity-make-value entity-name="UserPermission" value-field="updateUserPermission" map="context"/>
+                <entity-update value-field="updateUserPermission" />
+            </else>
+            </if>
         </actions>
     </service>
 </services>

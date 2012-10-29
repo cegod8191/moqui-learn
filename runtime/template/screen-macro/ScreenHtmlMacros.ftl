@@ -611,7 +611,11 @@ This Work includes contributions authored by David E. Jones, not as a
 			// 		    $('#${formNode["@name"]} tbody tr').each( function () {
 			// 		        this.insertBefore(  nCloneTd.cloneNode( true ), this.childNodes[0] );
 			// 		    } );
-			window.${formNode["@name"]} = $('#${formNode["@name"]}-form');
+			var form = window.${formNode["@name"]} = $('#${formNode["@name"]}-form');
+            form.submit = function(){
+                //alert(this + 'submit');
+                this.get(0).submit();
+            }
 		    window.${formNode["@name"]}Table = $('#${formNode["@name"]}').dataTable( {
 		        "bProcessing": true,
 		        "bServerSide": <#if serverSide>true<#else>false</#if>,

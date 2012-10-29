@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-1.2.xsd"
+        default-menu-include="false" default-menu-title="查找授权资源">
+
+    <transition name="createUserPermission">
+         <service-call name="create#UserPermission" />
+        <default-response url="."/>
+    </transition>
+
+
+    <transition name="saveUserPermission">
+        <service-call name="usermanage.user.UserServices.saveUserPermission"/>
+        <default-response url="."/>
+    </transition>
+
+    <actions>
+        <if condition="context.renderMode == 'json'">
+            <entity-find entity-name="UserPermission" list="listUserPermission">
+                <search-form-inputs/>
+            </entity-find>
+        </if>
+    </actions>
+
+    <widgets>
+
+        <form-single name="FindUserPermission">
+            <!-- <field name="tutorialId"><default-field><text-find/></default-field></field>
+                -->
+            <auto-fields-entity entity-name="UserPermission" field-type="find"/>
+            <field name="searchButton"><default-field title="Find"><submit style="btn-primary" for="ListUserPermission"/></default-field></field>
+        </form-single>
+
+        <toolbar id="toolbarUserPermission">
+            <button-group>
+                <button style="btn-small" click="dataTablesSelectAll('ListUserPermission')">全选</button>
+                <button style="btn-small" click="dataTablesReverseSelect('ListUserPermission')">反选</button>
+            </button-group>
+
+            <button-group>
+                <button style="btn-small" click="ListUserPermission.submit()" validchecked="have">删除</button>
+                <button style="btn-small" click="ListUserPermission.submit()">保存</button>
+            </button-group>
+
+            <container-dialog id="CreateUserPermissionDialog" button-text="建立新授权资源" style="btn-primary btn-small">
+                <form-single name="CreateUserPermission" transition="createUserPermission">
+                    <field name="description"><default-field><text-line /></default-field></field>
+                    <field name="submitButton">
+                        <default-field title="Create"><submit style="btn-primary"/></default-field>
+                    </field>
+                </form-single>
+            </container-dialog>
+        </toolbar>
+        <form-list name="ListUserPermission" list="listUserPermission" transition="saveUserPermission" multi="true"
+                   render="{'type':'dataTables', 'selectMode':'multi', 'toolbar': 'toolbarUserPermission'}">
+            <row-actions>
+                <set field="checkbox" from="userPermissionId"/>
+            </row-actions>
+            <field name="checkbox" style="th-checkbox">
+                <header-field title="" show-order-by="false"></header-field>
+                <default-field title=""><check></check></default-field>
+            </field>
+            <field name="userPermissionId"><default-field><display /></default-field></field>
+            <field name="description"><default-field>
+                <text-line />
+            </default-field></field>
+        </form-list>
+        <!--<container style="clearfix"></container>-->
+    </widgets>
+</screen>

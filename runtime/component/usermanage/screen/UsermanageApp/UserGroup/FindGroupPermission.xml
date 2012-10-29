@@ -5,18 +5,42 @@
     <!-- tab页上面的参数 -->
     <parameter name="userGroupId"/>
 
-    <transition name="updateGroupPermission">
-        <service-call name="usermanage.user.UserServices.updateGroupPermission"/>
+    <transition name="deleteGroupPermission">
+        <service-call name="usermanage.user.UserServices.deleteGroupPermission"/>
         <default-response url="."/>
     </transition>
 
+    <transition name="addGroupPermission">
+        <service-call name="usermanage.user.UserServices.addGroupPermission"/>
+        <default-response url="."/>
+    </transition>
+
+    <transition name="getPermissionList">
+        <actions>
+            <entity-find entity-name="UserPermission" list="permissionList" limit="20">
+                <econditions combine="or">
+                    <econdition field-name="userPermissionId" operator="like" value="%${term}%"/>
+                    <econdition field-name="description" operator="like" value="%${term}%" ignore-case="true"/>
+                </econditions>
+                <order-by field-name="description"/>
+            </entity-find>
+            <script>
+                def outList = []
+                for (def permission in permissionList)
+                outList.add([value:permission.userPermissionId, label:"${permission.description} [${permission.userPermissionId}]".toString()])
+                ec.web.sendJsonResponse(outList)
+            </script>
+        </actions>
+        <default-response type="none"/>
+    </transition>
+
     <actions>
-        <entity-find entity-name="UserGroupPermission" list="listUserGroupPermission">
+        <entity-find entity-name="UserGroupPermission" list="listGroupPermission">
             <econdition field-name="userGroupId" />
         </entity-find>
         <!-- 在未用<search-form-inputs/>的情况下,需要entity-find-count,否则取不到总记录数,模板"count = context[listName + "Count"]"会报错 -->
         <!-- count变量命名规则必须未list名+Count -->
-        <entity-find-count entity-name="UserGroupPermission" count-field="listUserGroupPermissionCount">
+        <entity-find-count entity-name="UserGroupPermission" count-field="listGroupPermissionCount">
             <econdition field-name="userGroupId" />
         </entity-find-count>
     </actions>
@@ -32,20 +56,38 @@
             <button-group>
                 <button id="buttonDelete" style="btn-small" click="ListGroupPermission.submit()" validchecked="have">删除所选权限</button>
             </button-group>
-            <button-group>
-                <button id="buttonSave" style="btn-small btn-primary" click="ListGroupPermission.submit()">新增权限</button>
-            </button-group>
+
+            <container-dialog id="AddGroupPermissionDialog" button-text="添加授权资源" style="btn-primary btn-small">
+                <form-single name="AddGroupPermission" transition="addGroupPermission">
+                    <field name="userPermissionId">
+                        <default-field title="授权资源">
+                            <text-line ac-transition="getPermissionList"/>
+                        </default-field>
+                    </field>
+                    <field name="userGroupId" hide="true"><default-field>
+                        <hidden default-value="${context.userGroupId}" />
+                    </default-field></field>
+                    <field name="submitButton">
+                        <default-field title="Add"><submit style="btn-primary"/></default-field>
+                    </field>
+                </form-single>
+            </container-dialog>
         </toolbar>
-        <form-list name="ListGroupPermission" list="listGroupPermission" transition="updateGroupPermission" multi="true"
+        <form-list name="ListGroupPermission" list="listGroupPermission" transition="deleteGroupPermission" multi="true"
                    render="{'type':'dataTables', 'selectMode':'multi', 'toolbar': 'toolbarUserGroupPermission', 'serverSide': true, 'pageSize': 100}">
             <row-actions>
                 <set field="checkbox" from="userPermissionId" />
+                <entity-find-one entity-name="UserPermission" value-field="foundUserPermission">
+                    <field-map field-name="userPermissionId" from="userPermissionId"/>
+                </entity-find-one>
+                <set field="description" from="foundUserPermission?foundUserPermission.description:''" />
             </row-actions>
             <field name="checkbox" style="th-checkbox">
                 <header-field title="" show-order-by="false"></header-field>
                 <default-field title=""><check></check></default-field>
             </field>
-            <field name="userPermissionId" hide=""><default-field title="授权编号"><display/></default-field></field>
+            <field name="userPermissionId"><default-field title="授权编号"><display/></default-field></field>
+            <field name="description"><default-field title="授权资源名称"><display/></default-field></field>
             <field name="fromDate"><default-field><date-time /></default-field></field>
             <field name="thruDate"><default-field><date-time /></default-field></field>
         </form-list>
