@@ -144,7 +144,7 @@ class EntityDbMeta {
             String pkName = "PK_" + ed.getTableName()
             int constraintNameClipLength = (databaseNode."@constraint-name-clip-length"?:"30") as int
             if (pkName.length() > constraintNameClipLength) pkName = pkName.substring(0, constraintNameClipLength)
-            sql.append("CONSTRAINT ").append(ed.getSchemaName() ? ed.getSchemaName() + "." : "").append(pkName)
+            sql.append("CONSTRAINT ").append(pkName)//sql.append("CONSTRAINT ").append(ed.getSchemaName() ? ed.getSchemaName() + "." : "").append(pkName)
         }
         sql.append(" PRIMARY KEY (")
         boolean isFirstPk = true
@@ -410,7 +410,7 @@ class EntityDbMeta {
                 }
                 sql.append(")")
             } else {
-                sql.append("CONSTRAINT ").append(ed.getSchemaName() ? ed.getSchemaName() + "." : "")
+                sql.append("CONSTRAINT ")//.append(ed.getSchemaName() ? ed.getSchemaName() + "." : "")
                         .append(constraintName.toString()).append(" FOREIGN KEY (")
                 boolean isFirst = true
                 for (String fieldName in keyMapKeys) {
