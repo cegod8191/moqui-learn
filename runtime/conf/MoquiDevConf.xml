@@ -70,11 +70,11 @@
 				 <!--jdbc-username="root" jdbc-password="root" pool-minsize="2"-->
 				 <!--pool-maxsize="50" />-->
         <!--</datasource> -->
-        <!-- <datasource group-name="transactional" database-conf-name="oracle" schema-name="MOQUI">
+        <!--<datasource group-name="transactional" database-conf-name="oracle" schema-name="MOQUI">
             <inline-jdbc jdbc-uri="jdbc:oracle:thin:@127.0.0.1:1521:urpdb"
                     jdbc-username="moqui" jdbc-password="moqui"
                     pool-minsize="2" pool-maxsize="50"/>
-        </datasource>-->
+        </datasource> -->
     </entity-facade>
 
     <repository-list>
