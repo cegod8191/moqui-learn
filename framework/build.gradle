@@ -44,8 +44,8 @@ dependencies {
     // may use in the future: runtime name: 'atomikos-transactions-jms', version: '3.7.0' // Apache 2.0
     compile name: 'atomikos-transactions-jta', version: '3.8.0' // Apache 2.0
 
-    apiCompile name: 'camel-core', version: '2.9.2' // Apache 2.0
-    compile name: 'camel-core', version: '2.9.2' // Apache 2.0
+    apiCompile name: 'camel-core', version: '2.10.1' // Apache 2.0
+    compile name: 'camel-core', version: '2.10.1' // Apache 2.0
 
     compile name: 'commons-codec', version: '1.4' // Apache 2.0
     compile name: 'commons-collections', version: '3.2.1' // Apache 2.0
@@ -113,13 +113,13 @@ dependencies {
     }
 
     // ========== runtime-only dependencies ==========
-    runtime name: 'camel-freemarker', version: '2.9.2' // Apache 2.0
-    runtime name: 'camel-groovy', version: '2.9.2' // Apache 2.0
-    runtime name: 'camel-http4', version: '2.9.2' // Apache 2.0
-    runtime name: 'camel-jms', version: '2.9.2' // Apache 2.0
-    runtime name: 'camel-mail', version: '2.9.2' // Apache 2.0
-    runtime name: 'camel-quartz', version: '2.9.2' // Apache 2.0
-    runtime name: 'camel-shiro', version: '2.9.2' // Apache 2.0
+    runtime name: 'camel-freemarker', version: '2.10.1' // Apache 2.0
+    runtime name: 'camel-groovy', version: '2.10.1' // Apache 2.0
+    runtime name: 'camel-http4', version: '2.10.1' // Apache 2.0
+    runtime name: 'camel-jms', version: '2.10.1' // Apache 2.0
+    runtime name: 'camel-mail', version: '2.10.1' // Apache 2.0
+    runtime name: 'camel-quartz', version: '2.10.1' // Apache 2.0
+    runtime name: 'camel-shiro', version: '2.10.1' // Apache 2.0
 
     /* For extended WebDAV connection to Jackrabbit these are needed:
     runtime name: 'jackrabbit-spi', version: '2.5.2' // Apache 2.0
@@ -130,10 +130,14 @@ dependencies {
     runtime name: 'commons-httpclient', version: '3.1' // Apache 2.0
     */
 
-    runtime name: 'derby', version: '10.8.2.2' // Apache 2.0
+    runtime name: 'derby', version: '10.9.1.0' // Apache 2.0
     runtime name: 'jakarta-oro', version: '2.0.8' // Apache 2.0
     runtime name: 'shiro-ehcache', version: '1.2.1' // Apache 2.0
     runtime name: 'shiro-quartz', version: '1.2.1' // Apache 2.0
+
+    // ========== test dependencies ==========
+    testCompile name: 'spock-core', version: '1.0-groovy-2.0-20121024' // Apache 2.0
+    testCompile name: 'junit', version: '4.10' // Apache 2.0
 }
 
 task apiJavadoc(type: Javadoc) {
@@ -147,6 +151,32 @@ compileJava.dependsOn startClasses
 compileJava.dependsOn apiClasses
 // add the classes directory for the api SourceSet to the main compile classpath so that dependent classes are available
 sourceSets.main.compileClasspath += files(sourceSets.api.output.classesDir)
+
+compileTestGroovy.dependsOn apiClasses
+compileTestGroovy.dependsOn classes
+sourceSets.test.compileClasspath += files(sourceSets.api.output.classesDir)
+sourceSets.test.compileClasspath += files(sourceSets.main.output.classesDir)
+
+// by default the Java plugin runs test on build, change to not do that (only run test if explicit task)
+check.dependsOn.remove('test')
+
+test {
+    systemProperty 'moqui.runtime', '../runtime'
+    systemProperty 'moqui.conf', 'conf/MoquiDevConf.xml'
+    systemProperty 'moqui.init.static', 'true'
+
+    testLogging.showStandardStreams = true
+
+    classpath += files(sourceSets.api.output.classesDir)
+    classpath += files(sourceSets.main.output.classesDir)
+    classpath += files(projectDir.absolutePath)
+    //classpath += fileTree(dir: projectDir.absolutePath,
+    //        includes: ['data/**', 'entity/**', 'screen/**', 'service/**', 'template/**', 'xsd/**'])
+
+    beforeTest { descriptor ->
+        logger.lifecycle("Running test: ${descriptor}")
+    }
+}
 
 jar {
     // this is necessary otherwise jar won't build when war plugin is applied
