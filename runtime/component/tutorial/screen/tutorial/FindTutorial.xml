@@ -48,7 +48,8 @@
 	        <entity-find entity-name="Tutorial" list="tutorialList">
 	            <search-form-inputs/>
 	        </entity-find>
-	         <log level="info" message="===============tutorialList:${tutorialList}"/>
+            <script>hasPermission = ec.user.hasPermission("100002")</script>
+	        <log level="info" message="===============hasPermission:${hasPermission}"/>
     	</if>
     </actions>
  
