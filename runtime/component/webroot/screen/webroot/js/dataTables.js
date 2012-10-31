@@ -175,6 +175,12 @@ sSearch_2
 sSortDir_0	asc
 */
 
+//ie fix
+if(typeof String.prototype.trim !== 'function') {
+    String.prototype.trim = function() {
+        return this.replace(/^\s+|\s+$/g, '');
+    }
+}
 
 $.fn.dataTableExt.oApi.fnAjaxUpdateDraw = function ( oSettings, html )
 {
