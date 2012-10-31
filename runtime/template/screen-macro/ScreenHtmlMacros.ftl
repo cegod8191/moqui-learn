@@ -1109,3 +1109,231 @@ This Work includes contributions authored by David E. Jones, not as a
 
 </script>
 </#macro>
+
+
+
+<#macro "form-single">
+    <#if sri.doBoundaryComments()><!-- BEGIN form-single[@name=${.node["@name"]}] --></#if>
+<#-- Use the formNode assembled based on other settings instead of the straight one from the file: -->
+    <#assign formNode = sri.getFtlFormNode(.node["@name"])>
+    <#assign skipStart = (formNode["@skip-start"]?if_exists == "true")>
+    <#assign skipEnd = (formNode["@skip-end"]?if_exists == "true")>
+    <#assign urlInfo = sri.makeUrlByType(formNode["@transition"], "transition", null)>
+    <#assign render = {"":""}>
+    <#assign render = formNode["@render"]?if_exists>
+    <#assign formType = "">
+    <#if render?has_content>
+        <#assign render_data = render?eval />
+        <#assign formType = (render_data.type)?if_exists>
+    <#else>
+
+    </#if>
+    <#if formType?has_content && formType == "easysearch">
+    <form class="easysearch" action="" method="post" id="FindTutorials" name="FindTutorials">
+        <input type="hidden" value="FindTutorials" name="moquiFormName">
+        <div class="btn-group fields-dropdown">
+            <button type="submit" class="btn btn-small btn-primary" name="easysearch" value="search">搜索</button>
+            <button tooltip="添加查询条件" class="btn btn-small dropdown-toggle add-cond"><span class="caret"></span></button>
+            <ul class="dropdown-menu">
+                <li><a href="#" field-name="field1" type="text">字段1</a></li>
+                <li><a href="#" field-name="field2" type="date">字段2</a></li>
+                <li><a href="#" field-name="field3" type="datetime">字段3</a></li>
+            </ul>
+        </div>
+    </form>
+    <script type="text/javascript" charset="utf-8">
+        function dropdown_hover(e){
+            $menu = $(this);
+            if (e.type == "mouseleave"){
+                window._time_handle = setTimeout(function(){
+                    $menu.hide();
+                }, 200);
+            }
+            if (e.type == "mouseenter"){
+                clearTimeout(window._time_handle);
+            }
+        }
+
+        function add_operator($ul, field_name, type){
+            var append_li = function(field_name, text, operate){
+                $ul.append($('<li><a href="#">' + text + '</a><input type="hidden" name="' + field_name + '_op" value="' + operate + '" /></li>'));
+            };
+            switch(type){
+                case 'text':
+                    append_li(field_name, '包含', 'contains');
+                    break;
+                default:;
+            }
+        }
+        function add_feild(a){
+            var field_text = $(a).text();
+            var field_name = $(a).attr('field-name');
+            var type = $(a).attr('type');
+            var $btngroup = $(a).parents('div.btn-group');
+            $new_cond = $(['<span class="condition">'
+                    + '<span class="search-field">字段'
+                    + '<input type="hidden" value="">'
+                    + '</span>'
+                    + '<a class="search-operator-toggle btn btn-small" data-toggle="dropdown" role="button" href="#">包含'
+                    + '	<input type="hidden" value="">'
+                    + '</a>'
+                    + '<ul style="display: hidden; position: absolute; " aria-labelledby="dropdownMenu" role="menu" class="dropdown-menu menu-cond"></ul>'
+                    + '<input type="text" class="span2">'
+                    + '<button class="close">×</button>'
+                    + '</span>'
+            ].join('')).insertBefore($btngroup);
+            var $cond_field = $new_cond.find('span.search-field');
+            var $cond_field_input = $new_cond.find('input[type=text]');
+            var $operator_ul = $new_cond.find('ul.menu-cond');
+            var $search_operator_toggle = $new_cond.find('a.search-operator-toggle');
+            $cond_field.text(field_text);
+            $cond_field_input.attr('name', field_name);
+            $cond_field_input.focus();
+            $new_cond.find('button.close').click(function(){$(this).parents('span.condition').remove()})
+            add_operator($operator_ul, field_name, type);
+            $search_operator_toggle.click(function(){
+                $menu = $(this).next();
+                var offset = $(this).offset();
+                $menu.css('left', offset.left + 'px')
+                $menu.css('top', offset.top + 25 + 'px')
+                $menu.show();
+            });
+            $operator_ul.on('hover', dropdown_hover);
+        }
+        $(document).ready(function(){
+            $('.easysearch input[type=text]').live('blur', function(){
+                //$(this).attr('type', 'hidden');
+            });
+            // $('.easysearch a.search-operator-toggle').live('click', function(){
+            // 	$menu = $(this).next();
+            // 	var offset = $(this).offset();
+            // 	$menu.css('left', offset.left + 'px')
+            // 	$menu.css('top', offset.top + 25 + 'px')
+            // 	$menu.show();
+            // });
+
+            $('.easysearch button.add-cond').on('hover', function(e){
+                $toggle = $(this);
+                $menu = $toggle.next();
+                if (e.type == "mouseleave"){
+                    window._time_handle = setTimeout(function(){
+                        $menu.hide();
+                    }, 200);
+                }
+                if (e.type == "mouseenter"){
+                    clearTimeout(window._time_handle);
+                    $menu.show();
+                }
+            });
+
+            $('.easysearch ul.dropdown-menu').on('hover', dropdown_hover);
+
+            $('.easysearch .fields-dropdown ul.dropdown-menu li a').click(function(e){
+                $menu = $(this).parent().parent();
+                $menu.hide();
+                add_feild(this);
+                return false;
+            });
+        });
+        </script>
+        <#return />
+    </#if>
+    <#if !skipStart>
+    <form name="${formNode["@name"]}" id="${formNode["@name"]}" method="post" action="${urlInfo.url}"<#if sri.isFormUpload(formNode["@name"])> enctype="multipart/form-data"</#if>>
+        <input type="hidden" name="moquiFormName" value="${formNode["@name"]}">
+    </#if>
+    <#if formNode["field-layout"]?has_content>
+        <#assign fieldLayout = formNode["field-layout"][0]>
+        <fieldset class="form-single-outer">
+            <#assign accordionId = fieldLayout["@id"]?default(formNode["@name"] + "-accordion")>
+            <#assign collapsible = (fieldLayout["@collapsible"]?if_exists == "true")>
+            <#assign collapsibleOpened = false>
+            <#list formNode["field-layout"][0]?children as layoutNode>
+                <#if layoutNode?node_name == "field-ref">
+                    <#if collapsibleOpened>
+                        <#assign collapsibleOpened = false>
+                        </div>
+                        <script>$("#${accordionId}").accordion({ collapsible: true });</script>
+                        <#assign accordionId = accordionId + "_A"><#-- set this just in case another accordion is opened -->
+                    </#if>
+                    <#assign fieldRef = layoutNode["@name"]>
+                    <#assign fieldNode = "invalid">
+                    <#list formNode["field"] as fn><#if fn["@name"] == fieldRef><#assign fieldNode = fn><#break></#if></#list>
+                    <#if fieldNode == "invalid">
+                        <div>Error: could not find field with name [${fieldRef}] referred to in a field-ref.@name attribute.</div>
+                    <#else>
+                        <@formSingleSubField fieldNode/>
+                    </#if>
+                <#elseif layoutNode?node_name == "field-row">
+                    <#if collapsibleOpened>
+                        <#assign collapsibleOpened = false>
+                        </div>
+                        <script>$("#${accordionId}").accordion({ collapsible: true });</script>
+                        <#assign accordionId = accordionId + "_A"><#-- set this just in case another accordion is opened -->
+                    </#if>
+                    <div class="field-row ui-helper-clearfix">
+                        <#assign inFieldRow = true>
+                        <#list layoutNode["field-ref"] as rowFieldRefNode>
+                            <div class="field-row-item">
+                                <#assign fieldRef = rowFieldRefNode["@name"]>
+                                <#assign fieldNode = "invalid">
+                                <#list formNode["field"] as fn><#if fn["@name"] == fieldRef><#assign fieldNode = fn><#break></#if></#list>
+                                <#if fieldNode == "invalid">
+                                    <div>Error: could not find field with name [${fieldRef}] referred to in a field-ref.@name attribute.</div>
+                                <#else>
+                                    <@formSingleSubField fieldNode/>
+                                </#if>
+                            </div>
+                        </#list>
+                        <#assign inFieldRow = false>
+                    </div>
+                <#elseif layoutNode?node_name == "field-group">
+                    <#if collapsible && !collapsibleOpened><#assign collapsibleOpened = true>
+                    <div id="${accordionId}">
+                    </#if>
+                    <h3><a href="#">${layoutNode["@title"]?default("Section " + layoutNode_index)}</a></h3>
+                    <div<#if layoutNode["@style"]?has_content> class="${layoutNode["@style"]}"</#if>>
+                        <#list layoutNode?children as groupNode>
+                            <#if groupNode?node_name == "field-ref">
+                                <#assign fieldRef = groupNode["@name"]>
+                                <#assign fieldNode = "invalid">
+                                <#list formNode["field"] as fn><#if fn["@name"] == fieldRef><#assign fieldNode = fn><#break></#if></#list>
+                                <@formSingleSubField fieldNode/>
+                            <#elseif groupNode?node_name == "field-row">
+                                <div class="field-row ui-helper-clearfix">
+                                    <#list groupNode["field-ref"] as rowFieldRefNode>
+                                        <div class="field-row-item">
+                                            <#assign fieldRef = rowFieldRefNode["@name"]>
+                                            <#assign fieldNode = "invalid">
+                                            <#list formNode["field"] as fn><#if fn["@name"] == fieldRef><#assign fieldNode = fn><#break></#if></#list>
+                                            <#if fieldNode == "invalid">
+                                                <div>Error: could not find field with name [${fieldRef}] referred to in a field-ref.@name attribute.</div>
+                                            <#else>
+                                                <@formSingleSubField fieldNode/>
+                                            </#if>
+                                        </div>
+                                    </#list>
+                                </div>
+                            </#if>
+                        </#list>
+                    </div>
+                </#if>
+            </#list>
+            <#if collapsibleOpened>
+            </div>
+                <script>$("#${accordionId}").accordion({ collapsible: true });</script>
+            </#if>
+        </fieldset>
+    <#else>
+        <fieldset class="form-single-outer">
+            <#list formNode["field"] as fieldNode><@formSingleSubField fieldNode/></#list>
+        </fieldset>
+    </#if>
+    <#if !skipEnd></form></#if>
+    <#if !skipStart>
+    <script>$("#${formNode["@name"]}").validate();</script>
+    <script>//$(document).tooltip();</script>
+    </#if>
+    <#if formNode["@focus-field"]?has_content><script>$("#${formNode["@name"]}_${formNode["@focus-field"]}").focus();</script></#if>
+    <#if sri.doBoundaryComments()><!-- END   form-single[@name=${.node["@name"]}] --></#if>
+</#macro>

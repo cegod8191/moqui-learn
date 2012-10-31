@@ -55,7 +55,7 @@
  
     <widgets>
 
-		<form-single name="FindTutorials">
+		<form-single name="FindTutorials" render="{'type':'easysearch'}">
 			<!-- <field name="tutorialId"><default-field><text-find/></default-field></field>
 			 -->
             <auto-fields-entity entity-name="Tutorial" field-type="find"/>

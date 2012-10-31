@@ -140,3 +140,52 @@ table.dataTable thead th{
 
 /* 解决joint连接器拖动转角乱跳的现象 */
 .ui-tabs{position:inherit;}
+
+/* 简单搜索 */
+.condition {
+    background-color: #D9EDF7;
+    border: 1px solid #BCE8F1;
+    border-radius: 4px 4px 4px 4px;
+    color: #3A87AD;
+    padding: 3px 2px 6px 8px;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+    margin-left: 5px;
+    margin-right: 5px;
+    height: 19px;
+    line-height: 19px;
+    font-size: 12px;
+    display:block;
+    width: 200px;
+    /*white-space:nowrap;*/
+}
+.condition .close{
+    /*margin-top:-4px;*/
+    margin-left:8px;
+    float: none;
+    opacity: 0.1;
+}
+.condition .close:hover{
+    opacity: 0.4;
+}
+.easysearch .btn-group {
+    display:inline;
+    margin-right: 5px;
+}
+.easysearch .span2{
+    height: 17px;
+    line-height: 17px;
+    margin-bottom: 0px;
+    padding: 3px 3px;
+    width: 80px;
+    border: 0px;
+}
+.easysearch .search-field{
+    line-height: 17px;
+    height: 17px;
+    font-size: 12px;
+}
+.easysearch .search-operator-toggle{
+    margin-bottom:0px;
+    margin-right: 2px;
+    height: 16px;
+}
