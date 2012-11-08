@@ -23,8 +23,10 @@ This Work includes contributions authored by David E. Jones, not as a
                          menu-title="Tools" menu-index="9"/>
         <subscreens-item name="tutorial" location="component://tutorial/screen/tutorial.xml"
                          menu-title="tutorial"/>
+        <subscreens-item name="productCategory" location="component://productCategory/screen/ProductCategoryApp.xml"
+                         menu-title="产品分类" menu-index="10"/>
         <subscreens-item name="usermanage" location="component://usermanage/screen/UsermanageApp.xml"
-                         menu-title="权限管理" menu-index="20"/>
+                         menu-title="用户管理" menu-index="20"/>
     </subscreens>
 
     <widgets>

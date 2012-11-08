@@ -1174,7 +1174,7 @@ This Work includes contributions authored by David E. Jones, not as a
                     + '<span class="search-field">字段'
                     + '<input type="hidden" value="">'
                     + '</span>'
-                    + '<a class="search-operator-toggle btn btn-small" data-toggle="dropdown" role="button" href="#">包含'
+                    + '<a class="search-operator-toggle href="#" rel="tooltip" data-original-title="Tooltip on top">包含'
                     + '	<input type="hidden" value="">'
                     + '</a>'
                     + '<ul style="display: hidden; position: absolute; " aria-labelledby="dropdownMenu" role="menu" class="dropdown-menu menu-cond"></ul>'
@@ -1194,8 +1194,8 @@ This Work includes contributions authored by David E. Jones, not as a
             $search_operator_toggle.click(function(){
                 $menu = $(this).next();
                 var offset = $(this).offset();
-                $menu.css('left', offset.left + 'px')
-                $menu.css('top', offset.top + 25 + 'px')
+                $menu.css('left', offset.left - 10 + 'px')
+                $menu.css('top', offset.top + 15 + 'px')
                 $menu.show();
             });
             $operator_ul.on('hover', dropdown_hover);

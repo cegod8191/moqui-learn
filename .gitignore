@@ -6,6 +6,7 @@ framework/.gradle/
 moqui-*.war
 runtime/db/derby/MoquiTenant/
 runtime/db/derby/MoquiTransactional/
+runtime/db/derby/MoquiAnalytical/
 runtime/db/derby/derby.log
 runtime/log/
 runtime/mantle/

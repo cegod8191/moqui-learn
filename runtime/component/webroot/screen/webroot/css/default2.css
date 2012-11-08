@@ -147,16 +147,14 @@ table.dataTable thead th{
     border: 1px solid #BCE8F1;
     border-radius: 4px 4px 4px 4px;
     color: #3A87AD;
-    padding: 3px 2px 6px 8px;
+    padding: 0px 2px 11px 8px;
     text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
-    margin-left: 5px;
-    margin-right: 5px;
-    height: 19px;
-    line-height: 19px;
+    margin: 5px;
+    height: 17px;
+    line-height: 17px;
     font-size: 12px;
-    display:block;
-    width: 200px;
-    /*white-space:nowrap;*/
+    display:inline-block;
+    white-space:nowrap;
 }
 .condition .close{
     /*margin-top:-4px;*/
@@ -169,12 +167,11 @@ table.dataTable thead th{
 }
 .easysearch .btn-group {
     display:inline;
-    margin-right: 5px;
+    margin: 5px;
 }
 .easysearch .span2{
-    height: 17px;
-    line-height: 17px;
-    margin-bottom: 0px;
+    height: 18px;
+    line-height: 18px;
     padding: 3px 3px;
     width: 80px;
     border: 0px;
@@ -185,7 +182,7 @@ table.dataTable thead th{
     font-size: 12px;
 }
 .easysearch .search-operator-toggle{
-    margin-bottom:0px;
+    margin-left:3px;
     margin-right: 2px;
     height: 16px;
 }
