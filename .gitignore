@@ -7,6 +7,7 @@ moqui-*.war
 runtime/db/derby/MoquiTenant/
 runtime/db/derby/MoquiTransactional/
 runtime/db/derby/MoquiAnalytical/
+runtime/db/orient/
 runtime/db/derby/derby.log
 runtime/log/
 runtime/mantle/
