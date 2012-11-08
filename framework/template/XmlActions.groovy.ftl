@@ -37,8 +37,8 @@ import org.moqui.impl.StupidUtilities
 <#macro "service-call">
     <#assign handleResult = (.node["@out-map"]?has_content && (!.node["@async"]?has_content || .node["@async"] == "false"))>
     if (true) {
-        <#if handleResult>def call_service_result = </#if>ec.service.<#if .node.@async?has_content && .node.@async != "false">async()<#else/>sync()</#if>.name("${.node.@name}")<#if .node["@async"]?if_exists == "persist">.persist(true)</#if><#if .node["@multi"]?if_exists == "true">.multi(true)</#if>
-            <#if .node["@in-map"]?if_exists == "true">.parameters(context).parameters((ec.web?.parameters)?:[:])<#elseif .node["@in-map"]?has_content && .node["@in-map"] != "false">.parameters(${.node["@in-map"]})</#if><#list .node["field-map"] as fieldMap>.parameter("${fieldMap["@field-name"]}",<#if fieldMap["@from"]?has_content>${fieldMap["@from"]}<#elseif fieldMap["@value"]?has_content>"""${fieldMap["@value"]}"""<#else>${fieldMap["@field-name"]}</#if>)</#list>.call()
+        <#if handleResult>def call_service_result = </#if>ec.service.<#if .node.@async?has_content && .node.@async != "false">async()<#else/>sync()</#if>.name("${.node.@name}")<#if .node["@async"]?if_exists == "persist">.persist(true)</#if><#if .node["@multi"]?if_exists == "true">.multi(true)</#if><#if .node["@multi"]?if_exists == "parameter">.multi(ec.web?.requestParameters?._isMulti == "true")</#if>
+            <#if .node["@in-map"]?if_exists == "true">.parameters(context)<#elseif .node["@in-map"]?has_content && .node["@in-map"] != "false">.parameters(${.node["@in-map"]})</#if><#list .node["field-map"] as fieldMap>.parameter("${fieldMap["@field-name"]}",<#if fieldMap["@from"]?has_content>${fieldMap["@from"]}<#elseif fieldMap["@value"]?has_content>"""${fieldMap["@value"]}"""<#else>${fieldMap["@field-name"]}</#if>)</#list>.call()
         <#if handleResult>
         if (context.${.node["@out-map"]} != null) {
             context.${.node["@out-map"]}.putAll(call_service_result)
@@ -71,7 +71,7 @@ if (${.node["@field"]}_temp_internal) ${.node["@field"]} = ${.node["@field"]}_te
 <#macro "filter-map-list"><#if .node["field-map"]?has_content>
     StupidUtilities.filterMapList(${.node["@list"]}, [<#list .node["field-map"] as fm>"${fm["@field-name"]}":<#if fm["@from"]?has_content>${fm["@from"]}<#else/>"""${fm["@value"]}"""</#if><#if fm_has_next>, </#if></#list>])
     </#if><#list .node["date-filter"] as df>
-    StupidUtilities.filterMapListByDate(${.node["@list"]}, ${df["@from-field-name"]?default("fromDate")}, ${df["@thru-field-name"]?default("thruDate")}, <#if df["@valid-date"]?has_content>${df["@valid-date"]} ?: ec.user.nowTimestamp<#else/>ec.user.nowTimestamp</#if>)
+    StupidUtilities.filterMapListByDate(${.node["@list"]}, "${df["@from-field-name"]?default("fromDate")}", "${df["@thru-field-name"]?default("thruDate")}", <#if df["@valid-date"]?has_content>${df["@valid-date"]} ?: ec.user.nowTimestamp<#else>ec.user.nowTimestamp</#if>)
     </#list>
 </#macro>
 

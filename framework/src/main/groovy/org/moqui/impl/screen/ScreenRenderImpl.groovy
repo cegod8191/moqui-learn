@@ -631,9 +631,7 @@ class ScreenRenderImpl implements ScreenRender {
         }
         return formNode
     }
-    FtlNodeWrapper getFtlFormNode(String formName) {
-        return FtlNodeWrapper.wrapNode(getFormNode(formName))
-    }
+    FtlNodeWrapper getFtlFormNode(String formName) { return FtlNodeWrapper.wrapNode(getFormNode(formName)) }
 
     boolean isFormUpload(String formName) {
         Node cachedFormNode = this.getFormNode(formName)
@@ -762,7 +760,7 @@ class ScreenRenderImpl implements ScreenRender {
         }
     }
 
-    String getFieldValue(FtlNodeWrapper fieldNodeWrapper, String defaultValue) {
+    Object getFieldValue(FtlNodeWrapper fieldNodeWrapper, String defaultValue) {
         Node fieldNode = fieldNodeWrapper.getGroovyNode()
         if (fieldNode."@entry-name") return ec.resource.evaluateContextField(fieldNode."@entry-name", null)
         String fieldName = fieldNode."@name"
@@ -787,7 +785,7 @@ class ScreenRenderImpl implements ScreenRender {
         if (!value) value = ec.context.get(fieldName)
         // this isn't needed since the parameters are copied to the context: if (!isError && isWebAndSameForm && !value) value = ec.web.parameters.get(fieldName)
 
-        if (value) return value as String
+        if (value) return value
         return ec.resource.evaluateStringExpand(defaultValue, null)
     }
 

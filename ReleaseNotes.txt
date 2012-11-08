@@ -2,7 +2,7 @@
 Moqui Framework Release Notes
 
 ===========================================================================
-Release 1.2.0 - 1 Nov 2012
+Release 1.2.0 - TBD
 ===========================================================================
 
 Moqui Framework release 1.2.0 is a minor new feature release and includes
@@ -43,6 +43,9 @@ This release includes:
     request via AJAX request and can depend on other field(s) to use as
     parameters and triggers for updating options on change, including
     example in the EditExample screen
+  - Added text-line.@format attribute like display.@format
+  - Field values are not automatically converted to strings before going
+    to the FTL file for more control over formatting
 - Service Facade
   - Inline and script services can leave out parameter values in the
     context and they will be picked up, instead of setting explicitly in
@@ -55,6 +58,8 @@ This release includes:
   - Added datasource.@startup-add-missing option; set to true to check
     tables for all entities in the database on startup and create missing
     ones
+  - Added database.@use-schema-for-all option; set to true to include the
+    schema name for non-table meta data (constraints, indexes, etc)
   - Entity find on a view-entity now automatically determines which
     member-entities to join in based on the fields selected, in order by,
     and in conditions; with this in place the need for DynamicViewEntity is
@@ -73,7 +78,9 @@ This release includes:
   details in session between redirects, and changed entity and service
   validation to add ValidationErrors instead of plain error Strings
 - Screen in Tools app for SQL Query Run/View
-
+- Improved classpath overrides for configuration and such in the
+  runtime/classes directory for both add-runtime/addRuntime and executable
+  WAR file deployment approaches
 
 Non-backward-compatible changes:
 
@@ -112,6 +119,11 @@ Bug Fixes:
 - Fixed file upload temporary file being deleted before being accessed/used
 - Fixed link with link-type=hidden-form within a form-single to not produce
   HTML with nested form elements
+- Fixed anonymous-all and anonymous-view authenticate options for services
+  to login as the _NA_ user so the called services requiring authentication
+  and permission will run as expected
+- Fixed display.@currency-unit-field attribute handling
+- Fixed XML Actions filter-map-list operation, wasn't quoting field names
 
 ===========================================================================
 Release 1.1.1 - 22 Sep 2012

@@ -322,93 +322,93 @@ ${sri.renderIncludeScreen(.node["@location"], .node["@share-scope"]?if_exists)}
     <form name="${formNode["@name"]}" id="${formNode["@name"]}" method="post" action="${urlInfo.url}"<#if sri.isFormUpload(formNode["@name"])> enctype="multipart/form-data"</#if>>
         <input type="hidden" name="moquiFormName" value="${formNode["@name"]}">
     </#if>
-        <#if formNode["field-layout"]?has_content>
-            <#assign fieldLayout = formNode["field-layout"][0]>
-            <fieldset class="form-single-outer">
-                <#assign accordionId = fieldLayout["@id"]?default(formNode["@name"] + "-accordion")>
-                <#assign collapsible = (fieldLayout["@collapsible"]?if_exists == "true")>
-                <#assign collapsibleOpened = false>
-                <#list formNode["field-layout"][0]?children as layoutNode>
-                    <#if layoutNode?node_name == "field-ref">
-                      <#if collapsibleOpened>
-                        <#assign collapsibleOpened = false>
-                        </div>
-                        <script>$("#${accordionId}").accordion({ collapsible: true });</script>
-                        <#assign accordionId = accordionId + "_A"><#-- set this just in case another accordion is opened -->
-                      </#if>
-                        <#assign fieldRef = layoutNode["@name"]>
-                        <#assign fieldNode = "invalid">
-                        <#list formNode["field"] as fn><#if fn["@name"] == fieldRef><#assign fieldNode = fn><#break></#if></#list>
-                        <#if fieldNode == "invalid">
-                            <div>Error: could not find field with name [${fieldRef}] referred to in a field-ref.@name attribute.</div>
-                        <#else>
-                            <@formSingleSubField fieldNode/>
-                        </#if>
-                    <#elseif layoutNode?node_name == "field-row">
-                      <#if collapsibleOpened>
-                        <#assign collapsibleOpened = false>
-                        </div>
-                        <script>$("#${accordionId}").accordion({ collapsible: true });</script>
-                        <#assign accordionId = accordionId + "_A"><#-- set this just in case another accordion is opened -->
-                      </#if>
-                        <div class="field-row ui-helper-clearfix">
-                        <#assign inFieldRow = true>
-                        <#list layoutNode["field-ref"] as rowFieldRefNode>
-                            <div class="field-row-item">
-                                <#assign fieldRef = rowFieldRefNode["@name"]>
-                                <#assign fieldNode = "invalid">
-                                <#list formNode["field"] as fn><#if fn["@name"] == fieldRef><#assign fieldNode = fn><#break></#if></#list>
-                                <#if fieldNode == "invalid">
-                                    <div>Error: could not find field with name [${fieldRef}] referred to in a field-ref.@name attribute.</div>
-                                <#else>
-                                    <@formSingleSubField fieldNode/>
-                                </#if>
-                            </div>
-                        </#list>
-                        <#assign inFieldRow = false>
-                        </div>
-                    <#elseif layoutNode?node_name == "field-group">
-                      <#if collapsible && !collapsibleOpened><#assign collapsibleOpened = true>
-                        <div id="${accordionId}">
-                      </#if>
-                        <h3><a href="#">${layoutNode["@title"]?default("Section " + layoutNode_index)}</a></h3>
-                        <div<#if layoutNode["@style"]?has_content> class="${layoutNode["@style"]}"</#if>>
-                            <#list layoutNode?children as groupNode>
-                                <#if groupNode?node_name == "field-ref">
-                                    <#assign fieldRef = groupNode["@name"]>
-                                    <#assign fieldNode = "invalid">
-                                    <#list formNode["field"] as fn><#if fn["@name"] == fieldRef><#assign fieldNode = fn><#break></#if></#list>
-                                    <@formSingleSubField fieldNode/>
-                                <#elseif groupNode?node_name == "field-row">
-                                    <div class="field-row ui-helper-clearfix">
-                                    <#list groupNode["field-ref"] as rowFieldRefNode>
-                                        <div class="field-row-item">
-                                            <#assign fieldRef = rowFieldRefNode["@name"]>
-                                            <#assign fieldNode = "invalid">
-                                            <#list formNode["field"] as fn><#if fn["@name"] == fieldRef><#assign fieldNode = fn><#break></#if></#list>
-                                            <#if fieldNode == "invalid">
-                                                <div>Error: could not find field with name [${fieldRef}] referred to in a field-ref.@name attribute.</div>
-                                            <#else>
-                                                <@formSingleSubField fieldNode/>
-                                            </#if>
-                                        </div>
-                                    </#list>
-                                    </div>
-                                </#if>
-                            </#list>
-                        </div>
-                    </#if>
-                </#list>
-                <#if collapsibleOpened>
+    <#if formNode["field-layout"]?has_content>
+        <#assign fieldLayout = formNode["field-layout"][0]>
+        <fieldset class="form-single-outer">
+            <#assign accordionId = fieldLayout["@id"]?default(formNode["@name"] + "-accordion")>
+            <#assign collapsible = (fieldLayout["@collapsible"]?if_exists == "true")>
+            <#assign collapsibleOpened = false>
+            <#list formNode["field-layout"][0]?children as layoutNode>
+                <#if layoutNode?node_name == "field-ref">
+                  <#if collapsibleOpened>
+                    <#assign collapsibleOpened = false>
                     </div>
                     <script>$("#${accordionId}").accordion({ collapsible: true });</script>
+                    <#assign accordionId = accordionId + "_A"><#-- set this just in case another accordion is opened -->
+                  </#if>
+                    <#assign fieldRef = layoutNode["@name"]>
+                    <#assign fieldNode = "invalid">
+                    <#list formNode["field"] as fn><#if fn["@name"] == fieldRef><#assign fieldNode = fn><#break></#if></#list>
+                    <#if fieldNode == "invalid">
+                        <div>Error: could not find field with name [${fieldRef}] referred to in a field-ref.@name attribute.</div>
+                    <#else>
+                        <@formSingleSubField fieldNode/>
+                    </#if>
+                <#elseif layoutNode?node_name == "field-row">
+                  <#if collapsibleOpened>
+                    <#assign collapsibleOpened = false>
+                    </div>
+                    <script>$("#${accordionId}").accordion({ collapsible: true });</script>
+                    <#assign accordionId = accordionId + "_A"><#-- set this just in case another accordion is opened -->
+                  </#if>
+                    <div class="field-row ui-helper-clearfix">
+                    <#assign inFieldRow = true>
+                    <#list layoutNode["field-ref"] as rowFieldRefNode>
+                        <div class="field-row-item">
+                            <#assign fieldRef = rowFieldRefNode["@name"]>
+                            <#assign fieldNode = "invalid">
+                            <#list formNode["field"] as fn><#if fn["@name"] == fieldRef><#assign fieldNode = fn><#break></#if></#list>
+                            <#if fieldNode == "invalid">
+                                <div>Error: could not find field with name [${fieldRef}] referred to in a field-ref.@name attribute.</div>
+                            <#else>
+                                <@formSingleSubField fieldNode/>
+                            </#if>
+                        </div>
+                    </#list>
+                    <#assign inFieldRow = false>
+                    </div>
+                <#elseif layoutNode?node_name == "field-group">
+                  <#if collapsible && !collapsibleOpened><#assign collapsibleOpened = true>
+                    <div id="${accordionId}">
+                  </#if>
+                    <h3><a href="#">${layoutNode["@title"]?default("Section " + layoutNode_index)}</a></h3>
+                    <div<#if layoutNode["@style"]?has_content> class="${layoutNode["@style"]}"</#if>>
+                        <#list layoutNode?children as groupNode>
+                            <#if groupNode?node_name == "field-ref">
+                                <#assign fieldRef = groupNode["@name"]>
+                                <#assign fieldNode = "invalid">
+                                <#list formNode["field"] as fn><#if fn["@name"] == fieldRef><#assign fieldNode = fn><#break></#if></#list>
+                                <@formSingleSubField fieldNode/>
+                            <#elseif groupNode?node_name == "field-row">
+                                <div class="field-row ui-helper-clearfix">
+                                <#list groupNode["field-ref"] as rowFieldRefNode>
+                                    <div class="field-row-item">
+                                        <#assign fieldRef = rowFieldRefNode["@name"]>
+                                        <#assign fieldNode = "invalid">
+                                        <#list formNode["field"] as fn><#if fn["@name"] == fieldRef><#assign fieldNode = fn><#break></#if></#list>
+                                        <#if fieldNode == "invalid">
+                                            <div>Error: could not find field with name [${fieldRef}] referred to in a field-ref.@name attribute.</div>
+                                        <#else>
+                                            <@formSingleSubField fieldNode/>
+                                        </#if>
+                                    </div>
+                                </#list>
+                                </div>
+                            </#if>
+                        </#list>
+                    </div>
                 </#if>
-            </fieldset>
-        <#else>
-            <fieldset class="form-single-outer">
-                <#list formNode["field"] as fieldNode><@formSingleSubField fieldNode/></#list>
-            </fieldset>
-        </#if>
+            </#list>
+            <#if collapsibleOpened>
+                </div>
+                <script>$("#${accordionId}").accordion({ collapsible: true });</script>
+            </#if>
+        </fieldset>
+    <#else>
+        <fieldset class="form-single-outer">
+            <#list formNode["field"] as fieldNode><@formSingleSubField fieldNode/></#list>
+        </fieldset>
+    </#if>
     <#if !skipEnd></form></#if>
     <#if !skipStart>
             <script>$("#${formNode["@name"]}").validate();</script>
@@ -782,7 +782,7 @@ ${sri.renderIncludeScreen(.node["@location"], .node["@share-scope"]?if_exists)}
         <#assign fieldValue = sri.getFieldValue(.node?parent?parent, "")>
     </#if>
     <#if .node["@currency-unit-field"]?has_content>
-        <#assign fieldValue = ec.l10n.formatCurrency(fieldValue, .node["@currency-unit-field"], 2)>
+        <#assign fieldValue = ec.l10n.formatCurrency(fieldValue, ec.resource.evaluateContextField(.node["@currency-unit-field"], ""), 2)>
     <#else>
         <#assign fieldValue = ec.l10n.formatValue(fieldValue, .node["@format"]?if_exists)>
     </#if>
@@ -853,7 +853,7 @@ ${sri.renderIncludeScreen(.node["@location"], .node["@share-scope"]?if_exists)}
 <#macro "file"><input type="file" name="<@fieldName .node/>" value="${sri.getFieldValue(.node?parent?parent, .node["@default-value"]!"")?html}" size="${.node.@size!"30"}"<#if .node.@maxlength?has_content> maxlength="${.node.@maxlength}"</#if><#if .node?parent["@tooltip"]?has_content> title="${.node?parent["@tooltip"]}"</#if>></#macro>
 
 <#macro "hidden">
-    <input type="hidden" name="<@fieldName .node/>" value="${sri.getFieldValue(.node?parent?parent, .node["@default-value"]!"")}">
+    <input type="hidden" name="<@fieldName .node/>" value="${sri.getFieldValue(.node?parent?parent, .node["@default-value"]!"").toString()?html}">
 </#macro>
 
 <#macro "ignored"><#-- shouldn't ever be called as it is checked in the form-* macros --></#macro>
@@ -914,8 +914,10 @@ ${sri.renderIncludeScreen(.node["@location"], .node["@share-scope"]?if_exists)}
 <#macro "text-line">
     <#assign id><@fieldId .node/></#assign>
     <#assign name><@fieldName .node/></#assign>
+    <#assign fieldValue = sri.getFieldValue(.node?parent?parent, .node["@default-value"]!"")>
+    <#if .node["@format"]?has_content><#assign fieldValue = ec.l10n.formatValue(fieldValue, .node["@format"])></#if>
     <#assign validationClasses = sri.getFormFieldValidationClasses(.node?parent?parent?parent["@name"], .node?parent?parent["@name"])>
-    <input type="<#if validationClasses?contains("email")>email<#elseif validationClasses?contains("url")>url<#elseif validationClasses?contains("number")>number<#else>text</#if>" name="${name}" value="${sri.getFieldValue(.node?parent?parent, .node["@default-value"]!"")?html}" size="${.node.@size!"30"}"<#if .node.@maxlength?has_content> maxlength="${.node.@maxlength}"</#if><#if ec.resource.evaluateCondition(.node.@disabled!"false", "")> disabled="disabled"</#if> id="${id}"<#if validationClasses?has_content> class="${validationClasses}"</#if><#if validationClasses?contains("required")> required</#if><#if .node?parent["@tooltip"]?has_content> title="${.node?parent["@tooltip"]}"</#if>>
+    <input type="<#if validationClasses?contains("email")>email<#elseif validationClasses?contains("url")>url<#elseif validationClasses?contains("number")>number<#else>text</#if>" name="${name}" value="${fieldValue?html}" size="${.node.@size!"30"}"<#if .node.@maxlength?has_content> maxlength="${.node.@maxlength}"</#if><#if ec.resource.evaluateCondition(.node.@disabled!"false", "")> disabled="disabled"</#if> id="${id}"<#if validationClasses?has_content> class="${validationClasses}"</#if><#if validationClasses?contains("required")> required</#if><#if .node?parent["@tooltip"]?has_content> title="${.node?parent["@tooltip"]}"</#if>>
     <#if .node["@ac-transition"]?has_content>
         <span id="${id}_value" class="form-autocomplete-value">&nbsp;</span>
         <script>

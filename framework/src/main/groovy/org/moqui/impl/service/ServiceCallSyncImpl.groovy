@@ -76,26 +76,41 @@ class ServiceCallSyncImpl extends ServiceCallImpl implements ServiceCallSync {
             EntityDefinition ed = sfi.ecfi.entityFacade.getEntityDefinition(noun)
             if (ed != null) inParameterNames = ed.getAllFieldNames()
         }
-        if (parameters.get("_isMulti") == "true") multi = true
+
         if (multi) {
-            for (int i = 0; ; i++) {
-                if ((parameters.get("_useRowSubmit") == "true" || parameters.get("_useRowSubmit_" + i) == "true")
-                        && parameters.get("_rowSubmit_" + i) != "true") continue
-                Map<String, Object> currentParms = new HashMap()
-                for (String ipn in inParameterNames) {
-                    String key = ipn + "_" + i
-                    if (this.parameters.containsKey(key)) {
-                        currentParms.put(ipn, this.parameters.get(key))
-                    } else if (this.parameters.containsKey(ipn)) {
-                        currentParms.put(ipn, this.parameters.get(ipn))
+            // run all service calls in a single transaction for multi form submits, ie all succeed or fail together
+            boolean beganTransaction = eci.getTransaction().begin(null)
+            try {
+                for (int i = 0; ; i++) {
+                    if ((parameters.get("_useRowSubmit") == "true" || parameters.get("_useRowSubmit_" + i) == "true")
+                            && parameters.get("_rowSubmit_" + i) != "true") continue
+                    Map<String, Object> currentParms = new HashMap()
+                    for (String ipn in inParameterNames) {
+                        String key = ipn + "_" + i
+                        if (this.parameters.containsKey(key)) {
+                            currentParms.put(ipn, this.parameters.get(key))
+                        } else if (this.parameters.containsKey(ipn)) {
+                            currentParms.put(ipn, this.parameters.get(ipn))
+                        }
+                    }
+                    // if the map stayed empty we have no parms, so we're done
+                    if (currentParms.size() == 0) break
+                    // call the service, ignore the result...
+                    callSingle(currentParms, sd, eci)
+                    // ... and break if there are any errors
+                    if (eci.getMessage().getErrors()) break
+                }
+            } catch (Throwable t) {
+                eci.getTransaction().rollback(beganTransaction, "Uncaught error running service [${sd.getServiceName()}] in multi mode", t)
+                throw t
+            } finally {
+                if (eci.getTransaction().isTransactionInPlace()) {
+                    if (eci.getMessage().getErrors()) {
+                        eci.getTransaction().rollback(beganTransaction, "Error message found running service [${sd.getServiceName()}] in multi mode", null)
+                    } else {
+                        eci.getTransaction().commit(beganTransaction)
                     }
                 }
-                // if the map stayed empty we have no parms, so we're done
-                if (currentParms.size() == 0) break
-                // call the service, ignore the result...
-                callSingle(currentParms, sd, eci)
-                // ... and break if there are any errors
-                if (eci.message.errors) break
             }
         } else {
             return callSingle(this.parameters, sd, eci)
@@ -124,10 +139,14 @@ class ServiceCallSyncImpl extends ServiceCallImpl implements ServiceCallSync {
         }
         eci.getArtifactExecution().push(new ArtifactExecutionInfoImpl(getServiceName(), "AT_SERVICE", authzAction),
                 (sd != null && sd.getAuthenticate() == "true"))
+
+        boolean loggedInAnonymous = false
         if (sd != null && sd.getAuthenticate() == "anonymous-all") {
             eci.getArtifactExecution().setAnonymousAuthorizedAll()
+            loggedInAnonymous = eci.getUser().loginAnonymousIfNoUser()
         } else if (sd != null && sd.getAuthenticate() == "anonymous-view") {
             eci.getArtifactExecution().setAnonymousAuthorizedView()
+            loggedInAnonymous = eci.getUser().loginAnonymousIfNoUser()
         }
         // NOTE: don't require authz if the service def doesn't authenticate
         // NOTE: if no sd then requiresAuthz is false, ie let the authz get handled at the entity level (but still put
@@ -253,6 +272,8 @@ class ServiceCallSyncImpl extends ServiceCallImpl implements ServiceCallSync {
 
         // all done so pop the artifact info; don't bother making sure this is done on errors/etc like in a finally clause because if there is an error this will help us know how we got there
         eci.getArtifactExecution().pop()
+
+        if (loggedInAnonymous) eci.getUser().logoutAnonymousOnly()
 
         return result
     }
