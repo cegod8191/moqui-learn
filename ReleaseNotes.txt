@@ -6,7 +6,9 @@ Release 1.2.0 - TBD
 ===========================================================================
 
 Moqui Framework release 1.2.0 is a minor new feature release and includes
-a number of bug fixes too.
+a number of bug fixes too. This release has undergone significantly more
+testing than previous releases because of a wider variety of functionality
+that has now been built and tested using the framework.
 
 The new features include popup menus (using the new jQueryUI menu widget),
 dynamic-options in XML Form drop-downs with dependency on other fields,
@@ -46,6 +48,9 @@ This release includes:
   - Added text-line.@format attribute like display.@format
   - Field values are not automatically converted to strings before going
     to the FTL file for more control over formatting
+  - Added screen.always-actions element with actions that will run
+    whenever the screen is in the path, whether rendered or not, and
+    before both rendering screens and running transitions
 - Service Facade
   - Inline and script services can leave out parameter values in the
     context and they will be picked up, instead of setting explicitly in
@@ -69,6 +74,8 @@ This release includes:
     databases
   - Support for java.util.UUID sequenced primary IDs; can be configured
     per-entity and/or per-datasource
+  - Added eeca.@get-entire-entity attribute to make sure we have the entire
+    record and not just PK fields before doing update and delete ops
 - Resource Facade
   - ExampleContent entity and corresponding screen that supports
     uploading and downloading JCR content
@@ -77,6 +84,8 @@ This release includes:
   and considering the ec.message.validationErrors list for storing error
   details in session between redirects, and changed entity and service
   validation to add ValidationErrors instead of plain error Strings
+- Added MessageFacade.hasError() method to check for error messages or
+  validation errors, and more reliably handle future forms of errors
 - Screen in Tools app for SQL Query Run/View
 - Improved classpath overrides for configuration and such in the
   runtime/classes directory for both add-runtime/addRuntime and executable
@@ -95,6 +104,12 @@ Non-backward-compatible changes:
 -- for migrating other data a user will have to be a member of a group and
    that group can be a single-user group or you can simplify existing data
    by consolidating users into groups that have the same subscreens
+- Local service calls (inline, java, and script) now run with an isolated
+  context so that fields from whatever called the service are not
+  available in the service (which would cause things to work when they
+  really shouldn't and wouldn't work if it was called remotely)
+-- make sure to retest all service calls as there could be hidden bugs
+   where a service worked because whatever called it had certain fields
 
 Bug Fixes:
 
@@ -126,6 +141,15 @@ Bug Fixes:
 - Fixed XML Actions filter-map-list operation, wasn't quoting field names
 - Fixed bug where authorization failures were getting logged but not
   throwing an exception to stop operations
+- Fixed issue where the root screen was not added to the screenPathDefList
+  causing incorrect push on the artifact facade's stack
+- Fixed issue where the last statement of XML Actions might have been
+  unintentionally considered to be the return/result Map
+- Fixed issue with multi (multi-row) service calls where parameters shared
+  between rows caused an attempt to process an additional non-existent row
+- Changed screen transition transaction handling to rollback on error
+- Fixed phantom parameter issue where declared parameters got a null value
+  in the parameters to a service even if no null was passed in
 
 ===========================================================================
 Release 1.1.1 - 22 Sep 2012

@@ -34,6 +34,7 @@ class ScreenDefinition {
     protected Map<String, TransitionItem> transitionByName = new HashMap()
     protected Map<String, SubscreensItem> subscreensByName = new HashMap()
 
+    protected XmlAction alwaysActions = null
     protected XmlAction preActions = null
 
     protected ScreenSection rootSection = null
@@ -52,6 +53,10 @@ class ScreenDefinition {
         // parameter
         for (Node parameterNode in screenNode."parameter")
             parameterByName.put(parameterNode."@name", new ParameterItem(parameterNode, location))
+        // prep always-actions
+        if (screenNode."always-actions") {
+            alwaysActions = new XmlAction(sfi.ecfi, (Node) screenNode."always-actions"[0], location + ".always_actions")
+        }
         // transition
         for (Node transitionNode in screenNode."transition") {
             TransitionItem ti = new TransitionItem(transitionNode, this)
@@ -365,11 +370,11 @@ class ScreenDefinition {
 
             ResponseItem ri = null
             // if there is an error-response and there are errors, we have a winner
-            if (sri.ec.message.errors && errorResponse) ri = errorResponse
+            if (sri.getEc().getMessage().hasError() && errorResponse) ri = errorResponse
 
             // check all conditional-response, if condition then return that response
             if (ri == null) for (ResponseItem condResp in conditionalResponseList) {
-                if (condResp.checkCondition(sri.ec)) ri = condResp
+                if (condResp.checkCondition(sri.getEc())) ri = condResp
             }
             // no errors, no conditionals, return default
             if (ri == null) ri = defaultResponse

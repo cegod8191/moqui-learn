@@ -87,25 +87,25 @@ class ServiceCallSyncImpl extends ServiceCallImpl implements ServiceCallSync {
                     Map<String, Object> currentParms = new HashMap()
                     for (String ipn in inParameterNames) {
                         String key = ipn + "_" + i
-                        if (this.parameters.containsKey(key)) {
-                            currentParms.put(ipn, this.parameters.get(key))
-                        } else if (this.parameters.containsKey(ipn)) {
-                            currentParms.put(ipn, this.parameters.get(ipn))
-                        }
+                        if (parameters.containsKey(key)) currentParms.put(ipn, parameters.get(key))
                     }
                     // if the map stayed empty we have no parms, so we're done
                     if (currentParms.size() == 0) break
+                    // now that we have checked the per-row parameters, add in others available
+                    for (String ipn in inParameterNames) {
+                        if (!currentParms.get(ipn) && parameters.get(ipn)) currentParms.put(ipn, parameters.get(ipn))
+                    }
                     // call the service, ignore the result...
                     callSingle(currentParms, sd, eci)
                     // ... and break if there are any errors
-                    if (eci.getMessage().getErrors()) break
+                    if (eci.getMessage().hasError()) break
                 }
             } catch (Throwable t) {
                 eci.getTransaction().rollback(beganTransaction, "Uncaught error running service [${sd.getServiceName()}] in multi mode", t)
                 throw t
             } finally {
                 if (eci.getTransaction().isTransactionInPlace()) {
-                    if (eci.getMessage().getErrors()) {
+                    if (eci.getMessage().hasError()) {
                         eci.getTransaction().rollback(beganTransaction, "Error message found running service [${sd.getServiceName()}] in multi mode", null)
                     } else {
                         eci.getTransaction().commit(beganTransaction)
@@ -118,6 +118,11 @@ class ServiceCallSyncImpl extends ServiceCallImpl implements ServiceCallSync {
     }
 
     Map<String, Object> callSingle(Map<String, Object> currentParameters, ServiceDefinition sd, ExecutionContextImpl eci) {
+        if (eci.getMessage().hasError()) {
+            logger.warn("Found error(s) before service [${getServiceName()}], so not running service. Errors: ${eci.getMessage().getErrorsString()}")
+            return null
+        }
+
         long callStartTime = System.currentTimeMillis()
 
         boolean userLoggedIn = false
@@ -194,7 +199,10 @@ class ServiceCallSyncImpl extends ServiceCallImpl implements ServiceCallSync {
         // in-parameter validation
         sd.convertValidateCleanParameters(currentParameters, eci)
         // if error(s) in parameters, return now with no results
-        if (eci.getMessage().getErrors().size() > 0) return null
+        if (eci.getMessage().hasError()) {
+            logger.warn("Found error(s) when validating input parameters for service [${getServiceName()}], so not running service. Errors: ${eci.getMessage().getErrorsString()}; the artifact stack is:\n ${eci.artifactExecution.stack}")
+            return null
+        }
 
         TransactionFacade tf = sfi.getEcfi().getTransactionFacade()
         boolean suspendedTransaction = false
@@ -203,11 +211,11 @@ class ServiceCallSyncImpl extends ServiceCallImpl implements ServiceCallSync {
             // authentication
             sfi.runSecaRules(getServiceName(), currentParameters, null, "pre-auth")
             // NOTE: auto user login done above, before first authz check
-            if (sd.getAuthenticate() == "true" && !eci.getUser().getUserId())
+            if (sd.getAuthenticate() == "true" && !eci.getUser().getUserId() && !eci.getUser().getLoggedInAnonymous())
                 eci.getMessage().addError("Authentication required for service [${getServiceName()}]")
 
             // if error in auth or for other reasons, return now with no results
-            if (eci.getMessage().getErrors().size() > 0) return null
+            if (eci.getMessage().hasError()) return null
 
             if (pauseResumeIfNeeded && tf.isTransactionInPlace()) suspendedTransaction = tf.suspend()
             boolean beganTransaction = beginTransactionIfNeeded ? tf.begin(sd.getTxTimeout()) : false
@@ -223,8 +231,8 @@ class ServiceCallSyncImpl extends ServiceCallImpl implements ServiceCallSync {
 
                 sfi.runSecaRules(getServiceName(), currentParameters, result, "post-service")
                 // if we got any errors added to the message list in the service, rollback for that too
-                if (eci.getMessage().getErrors().size() > 0) {
-                    tf.rollback(beganTransaction, "Error running service [${getServiceName()}] (message): " + eci.getMessage().getErrors().get(0), null)
+                if (eci.getMessage().hasError()) {
+                    tf.rollback(beganTransaction, "Error running service [${getServiceName()}] (message): " + eci.getMessage().getErrorsString(), null)
                 }
             } catch (ArtifactAuthorizationException e) {
                 // this is a local call, pass certain exceptions through
@@ -267,7 +275,7 @@ class ServiceCallSyncImpl extends ServiceCallImpl implements ServiceCallSync {
             long endTime = System.currentTimeMillis()
             sfi.getEcfi().countArtifactHit("service", serviceType, getServiceName(), currentParameters, callStartTime, endTime, null)
 
-            if (logger.traceEnabled) logger.trace("Finished call to service [${getServiceName()}] in ${(endTime-callStartTime)/1000} seconds" + (eci.message.errors ? " with ${eci.message.errors.size()} error messages" : ", was successful"))
+            if (logger.traceEnabled) logger.trace("Finished call to service [${getServiceName()}] in ${(endTime-callStartTime)/1000} seconds" + (eci.getMessage().hasError() ? " with ${eci.getMessage().getErrors().size() + eci.getMessage().getValidationErrors().size()} error messages" : ", was successful"))
         }
 
         // all done so pop the artifact info; don't bother making sure this is done on errors/etc like in a finally clause because if there is an error this will help us know how we got there

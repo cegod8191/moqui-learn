@@ -155,6 +155,53 @@ class ScreenRenderImpl implements ScreenRender {
         return internalWriter.toString()
     }
 
+    protected ResponseItem recursiveRunTransition(Iterator<ScreenDefinition> sdIterator) {
+        ScreenDefinition sd = sdIterator.next()
+        // for these authz is not required, as long as something authorizes on the way to the transition, or
+        // the transition itself, it's fine
+        ec.artifactExecution.push(
+                new ArtifactExecutionInfoImpl(sd.location, "AT_XML_SCREEN", "AUTHZA_VIEW"), false)
+
+        boolean loggedInAnonymous = false
+        Node screenNode = sd.getScreenNode()
+        if (screenNode."@require-authentication" == "anonymous-all") {
+            ec.artifactExecution.setAnonymousAuthorizedAll()
+            loggedInAnonymous = ec.getUser().loginAnonymousIfNoUser()
+        } else if (screenNode."@require-authentication" == "anonymous-view") {
+            ec.artifactExecution.setAnonymousAuthorizedView()
+            loggedInAnonymous = ec.getUser().loginAnonymousIfNoUser()
+        }
+
+        if (sd.alwaysActions != null) sd.alwaysActions.run(ec)
+
+        ResponseItem ri = null
+        if (sdIterator.hasNext()) {
+            ri = recursiveRunTransition(sdIterator)
+        } else {
+            // run the transition
+            if (screenUrlInfo.getExtraPathNameList() && screenUrlInfo.targetTransition.getPathParameterList()) {
+                List<String> pathParameterList = screenUrlInfo.targetTransition.getPathParameterList()
+                int i = 0
+                for (String extraPathName in screenUrlInfo.getExtraPathNameList()) {
+                    if (pathParameterList.size() > i) {
+                        if (ec.web) ec.web.addDeclaredPathParameter(pathParameterList.get(i), extraPathName)
+                        ec.context.put(pathParameterList.get(i), extraPathName)
+                        i++
+                    } else {
+                        break
+                    }
+                }
+            }
+
+            ri = screenUrlInfo.targetTransition.run(this)
+        }
+
+        ec.artifactExecution.pop()
+        if (loggedInAnonymous) ec.getUser().logoutAnonymousOnly()
+
+        return ri
+    }
+
     protected void internalRender() {
         rootScreenDef = sfi.getScreenDefinition(rootScreenLocation)
         if (!rootScreenDef) throw new BaseException("Could not find screen at location [${rootScreenLocation}]")
@@ -218,42 +265,21 @@ class ScreenRenderImpl implements ScreenRender {
             boolean beganTransaction = sfi.ecfi.transactionFacade.begin(null)
             ResponseItem ri = null
             try {
-                // for inherited permissions to work, walk the screen list and artifact push them, then pop after
-                int screensPushed = 0
-                for (ScreenDefinition permSd in screenUrlInfo.screenPathDefList) {
-                    screensPushed++
-                    // for these authz is not required, as long as something authorizes on the way to the transition, or
-                    // the transition itself, it's fine
-                    ec.artifactExecution.push(
-                            new ArtifactExecutionInfoImpl(permSd.location, "AT_XML_SCREEN", "AUTHZA_VIEW"), false)
-                }
-
-                if (screenUrlInfo.getExtraPathNameList() && screenUrlInfo.targetTransition.getPathParameterList()) {
-                    List<String> pathParameterList = screenUrlInfo.targetTransition.getPathParameterList()
-                    int i = 0
-                    for (String extraPathName in screenUrlInfo.getExtraPathNameList()) {
-                        if (pathParameterList.size() > i) {
-                            if (ec.web) ec.web.addDeclaredPathParameter(pathParameterList.get(i), extraPathName)
-                            ec.context.put(pathParameterList.get(i), extraPathName)
-                            i++
-                        } else {
-                            break
-                        }
-                    }
-                }
-
-                ri = screenUrlInfo.targetTransition.run(this)
-
-                for (int i = screensPushed; i > 0; i--) ec.artifactExecution.pop()
+                ri = recursiveRunTransition(screenUrlInfo.screenPathDefList.iterator())
             } catch (Throwable t) {
                 sfi.ecfi.transactionFacade.rollback(beganTransaction, "Error running transition in [${screenUrlInfo.url}]", t)
                 throw t
             } finally {
                 try {
-                    if (beganTransaction && sfi.ecfi.transactionFacade.isTransactionInPlace())
-                        sfi.ecfi.transactionFacade.commit()
+                    if (sfi.ecfi.transactionFacade.isTransactionInPlace()) {
+                        if (ec.getMessage().hasError()) {
+                            sfi.ecfi.transactionFacade.rollback(beganTransaction, ec.getMessage().getErrorsString(), null)
+                        } else {
+                            sfi.ecfi.transactionFacade.commit(beganTransaction)
+                        }
+                    }
                 } catch (Exception e) {
-                    logger.error("Error committing screen transition transaction", e)
+                    logger.error("Error ending screen transition transaction", e)
                 }
 
                 if (screenUrlInfo.targetScreen.screenNode."@track-artifact-hit" != "false") {
@@ -265,7 +291,7 @@ class ScreenRenderImpl implements ScreenRender {
 
             if (ri == null) throw new IllegalArgumentException("No response found for transition [${screenUrlInfo.targetTransition.name}] on screen [${screenUrlInfo.targetScreen.location}]")
 
-            if (ri.saveCurrentScreen && ec.web) {
+            if (ri.saveCurrentScreen && ec.web != null) {
                 StringBuilder screenPath = new StringBuilder()
                 for (String pn in screenUrlInfo.fullPathNameList) screenPath.append("/").append(pn)
                 ((WebFacadeImpl) ec.web).saveScreenLastInfo(screenPath.toString(), null)
@@ -277,7 +303,7 @@ class ScreenRenderImpl implements ScreenRender {
             String urlType = ri.urlType ?: "screen-path"
 
             // handle screen-last, etc
-            if (ec.web) {
+            if (ec.web != null) {
                 WebFacadeImpl wfi = (WebFacadeImpl) ec.web
                 if (ri.type == "screen-last" || ri.type == "screen-last-noparam") {
                     String savedUrl = wfi.getRemoveScreenLastPath()
@@ -295,11 +321,10 @@ class ScreenRenderImpl implements ScreenRender {
             // either send a redirect for the response, if possible, or just render the response now
             if (this.response != null) {
                 // save messages in session before redirecting so they can be displayed on the next screen
-                if (ec.web) {
+                if (ec.web != null) {
                     ((WebFacadeImpl) ec.web).saveMessagesToSession()
                     if (ri.saveParameters) ((WebFacadeImpl) ec.web).saveRequestParametersToSession()
-                    if (ec.message.errors || ec.message.validationErrors)
-                        ((WebFacadeImpl) ec.web).saveErrorParametersToSession()
+                    if (ec.message.hasError()) ((WebFacadeImpl) ec.web).saveErrorParametersToSession()
                 }
 
                 if (urlType == "plain") {
@@ -411,14 +436,52 @@ class ScreenRenderImpl implements ScreenRender {
         }
     }
 
+    protected void recursiveRunActions(Iterator<ScreenDefinition> screenDefIterator, boolean runAlwaysActions, boolean runPreActions) {
+        ScreenDefinition sd = screenDefIterator.next()
+        // check authz first, including anonymous-* handling so that permissions and auth are in place
+        // NOTE: don't require authz if the screen doesn't require auth
+        Node screenNode = sd.getScreenNode()
+        ec.artifactExecution.push(new ArtifactExecutionInfoImpl(sd.location, "AT_XML_SCREEN", "AUTHZA_VIEW"),
+                !screenDefIterator.hasNext() ? (!screenNode."@require-authentication" || screenNode."@require-authentication" == "true") : false)
+
+        boolean loggedInAnonymous = false
+        if (screenNode."@require-authentication" == "anonymous-all") {
+            ec.artifactExecution.setAnonymousAuthorizedAll()
+            loggedInAnonymous = ec.getUser().loginAnonymousIfNoUser()
+        } else if (screenNode."@require-authentication" == "anonymous-view") {
+            ec.artifactExecution.setAnonymousAuthorizedView()
+            loggedInAnonymous = ec.getUser().loginAnonymousIfNoUser()
+        }
+
+        if (runAlwaysActions && sd.alwaysActions != null) sd.alwaysActions.run(ec)
+        if (runPreActions && sd.preActions != null) sd.preActions.run(ec)
+
+        if (screenDefIterator.hasNext()) recursiveRunActions(screenDefIterator, runAlwaysActions, runPreActions)
+
+        // all done so pop the artifact info; don't bother making sure this is done on errors/etc like in a finally clause because if there is an error this will help us know how we got there
+        ec.artifactExecution.pop()
+        if (loggedInAnonymous) ec.getUser().logoutAnonymousOnly()
+    }
+
     void doActualRender() {
         long screenStartTime = System.currentTimeMillis()
         boolean beganTransaction = screenUrlInfo.beginTransaction ? sfi.ecfi.transactionFacade.begin(null) : false
         try {
-            // before we kick-off rendering run all pre-actions
-            for (ScreenDefinition sd in screenUrlInfo.screenRenderDefList) {
-                if (sd.preActions != null) sd.preActions.run(ec)
+            // run always-actions for all screens in path
+            boolean hasAlwaysActions = false
+            for (ScreenDefinition sd in screenUrlInfo.screenPathDefList) if (sd.alwaysActions != null) { hasAlwaysActions = true; break }
+            if (hasAlwaysActions) {
+                Iterator<ScreenDefinition> screenDefIterator = screenUrlInfo.screenPathDefList.iterator()
+                recursiveRunActions(screenDefIterator, true, false)
             }
+            // run pre-actions for just the screens that will be rendered
+            boolean hasPreActions = false
+            for (ScreenDefinition sd in screenUrlInfo.screenRenderDefList) if (sd.preActions != null) { hasPreActions = true; break }
+            if (hasPreActions) {
+                Iterator<ScreenDefinition> screenDefIterator = screenUrlInfo.screenRenderDefList.iterator()
+                recursiveRunActions(screenDefIterator, false, true)
+            }
+
             if (response != null) {
                 response.setContentType(this.outputContentType)
                 response.setCharacterEncoding(this.characterEncoding)
@@ -467,7 +530,8 @@ class ScreenRenderImpl implements ScreenRender {
 
         // if screen requires auth and there is not active user redirect to login screen, save this request
         if (logger.traceEnabled) logger.trace("Checking screen [${currentSd.location}] for require-authentication, current user is [${ec.user.userId}]")
-        if ((!(currentSd.screenNode?."@require-authentication") || currentSd.screenNode?."@require-authentication" == "true") && !ec.user.userId) {
+        if ((!(currentSd.screenNode?."@require-authentication") || currentSd.screenNode?."@require-authentication" == "true")
+                && !ec.getUser().getUserId() && !ec.getUser().getLoggedInAnonymous()) {
             logger.info("Screen at location [${currentSd.location}], which is part of [${screenUrlInfo.fullPathNameList}] under screen [${screenUrlInfo.fromSd.location}] requires authentication but no user is currently logged in.")
             // save the request as a save-last to use after login
             if (ec.web) {
