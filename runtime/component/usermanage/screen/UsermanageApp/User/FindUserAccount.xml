@@ -16,6 +16,11 @@
         <default-response url="../EditUserAccount"/>
     </transition>
 
+    <transition name="deleteUserAccount">
+        <service-call name="usermanage.user.UserServices.deleteUserAccount" />
+        <default-response url="."></default-response>
+    </transition>
+
     <actions>
         <if condition="context.renderMode == 'json'">
             <entity-find entity-name="UserAccount" list="listUserAccount">
@@ -39,8 +44,6 @@
         </container-dialog>
 
         <form-single name="FindUserAccount">
-            <!-- <field name="tutorialId"><default-field><text-find/></default-field></field>
-                -->
             <auto-fields-entity entity-name="UserAccount" field-type="find"/>
             <field name="searchButton"><default-field title="Find"><submit style="btn-primary" for="ListUserAccount"/></default-field></field>
         </form-single>
@@ -52,27 +55,15 @@
             </button-group>
 
             <button-group>
-                <!--<menu name="test2" title="测试2" down-arrow="true">-->
-                    <!--<menu-item name="item1" transition="createUserAccount"></menu-item>-->
-                    <!--<menu-item name="item2" transition="createUserAccount"></menu-item>-->
-                <!--</menu>-->
-                <button style="btn-small" click="ListUserAccount.submit()" validchecked="1">修改</button>
+                <button style="btn-small" click="ListUserAccount.submit()" validchecked="have">删除</button>
             </button-group>
         </toolbar>
-        <form-list name="ListUserAccount" list="listUserAccount" transition="editUserAccount"
-                   render="{'type':'dataTables', 'selectMode':'single', 'toolbar': 'toolbarUserAccount', 'serverSide': true}">
-            <row-actions>
-                <set field="checkbox" from="userId"/>
-
-            </row-actions>
-            <field name="checkbox" style="th-checkbox">
+        <form-list name="ListUserAccount" list="listUserAccount" transition="deleteUserAccount"
+                   render="{'type':'dataTables', 'selectMode':'multi', 'toolbar': 'toolbarUserAccount', 'serverSide': true}">
+            <field name="userId" style="th-checkbox">
                 <header-field title="" show-order-by="false"></header-field>
                 <default-field title=""><check></check></default-field>
             </field>
-            <!--<auto-fields-entity entity-name="UserAccount" field-type="display"/>-->
-            <!--<field name="userId">-->
-                <!--<default-field><display></display></default-field>-->
-            <!--</field>-->
             <field name="username">
                 <default-field><link url="editUserAccount" text="${username}" style="btn-small"/></default-field>
             </field>
@@ -86,11 +77,6 @@
                 <default-field><display></display></default-field>
             </field>
             <field name="lastUpdatedStamp" hide="true"><default-field><display/></default-field></field>
-            <!--<field name="operateMenu" style="th-operate-menu">-->
-                <!--<header-field title="操作" show-order-by="false"></header-field>-->
-                <!--<default-field><menu transition="menu"/></default-field>-->
-            <!--</field>-->
         </form-list>
-        <!--<container style="clearfix"></container>-->
     </widgets>
 </screen>

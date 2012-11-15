@@ -71,6 +71,7 @@
     <!-- 删除用户组成员 -->
     <service verb="deleteGroupMember" type="inline">
         <in-parameters>
+            <parameter name="userGroupId" required="true" />
             <parameter name="userId" />
         </in-parameters>
         <out-parameters>
@@ -78,9 +79,26 @@
         <actions>
             <if condition="context.userId != null">
                 <entity-delete-by-condition entity-name="UserGroupMember">
+                    <econdition field-name="userGroupId" from="context.userGroupId" />
                     <econdition field-name="userId" from="context.userId" />
                 </entity-delete-by-condition>
             </if>
+        </actions>
+    </service>
+
+    <!-- 删除用户账户 -->
+    <service verb="deleteUserAccount" type="inline">
+        <in-parameters>
+            <parameter name="userId" required="true"/>
+        </in-parameters>
+        <out-parameters>
+        </out-parameters>
+        <actions>
+            <entity-delete-by-condition entity-name="UserGroupMember">
+                <econdition field-name="userId" from="context.userId" />
+            </entity-delete-by-condition>
+            <entity-make-value entity-name="UserAccount" value-field="userAccount" map="context" />
+            <entity-delete value-field="userAccount" />
         </actions>
     </service>
 

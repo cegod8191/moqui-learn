@@ -91,8 +91,8 @@
                 <header-field title="" show-order-by="false"></header-field>
                 <default-field title=""><check></check></default-field>
             </field>
-            <field name="username" hide=""><default-field title="用户名"><display text="${userAccount.username}"/></default-field></field>
-            <field name="userFullName" hide=""><default-field title="用户姓名"><display text="${userAccount.userFullName}"/></default-field></field>
+            <field name="username" hide=""><default-field title="用户名"><display text="${userAccount?.username}"/></default-field></field>
+            <field name="userFullName" hide=""><default-field title="用户姓名"><display text="${userAccount?.userFullName}"/></default-field></field>
             <field name="fromDate"><default-field><date-time /></default-field></field>
             <field name="thruDate"><default-field><date-time /></default-field></field>
         </form-list>
