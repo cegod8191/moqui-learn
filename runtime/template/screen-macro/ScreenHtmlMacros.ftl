@@ -1131,6 +1131,10 @@ This Work includes contributions authored by David E. Jones, not as a
     <#if formType?has_content && formType == "easysearch">
     <form class="easysearch" action="" method="post" id="FindTutorials" name="FindTutorials">
         <input type="hidden" value="FindTutorials" name="moquiFormName">
+        <#assign aaa>
+        <#list formNode["field"] as fieldNode><@formSingleSubField fieldNode/></#list>
+        </#assign>
+        ${aaa}
         <div class="btn-group fields-dropdown">
             <button type="submit" class="btn btn-small btn-primary" name="easysearch" value="search">搜索</button>
             <button tooltip="添加查询条件" class="btn btn-small dropdown-toggle add-cond"><span class="caret"></span></button>
