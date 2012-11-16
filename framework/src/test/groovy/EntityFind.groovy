@@ -26,7 +26,9 @@ class EntityFind extends Specification {
     def setup() {
         ec.artifactExecution.disableAuthz()
         ec.transaction.begin(null)
-        ec.entity.makeValue("Example").setAll([exampleId:"TEST1", exampleName:"Test Name", exampleSize: 100, exampleDate: timestamp]).createOrUpdate()
+        ec.entity.makeValue("Example").setAll([exampleId:"TEST1", exampleTypeEnumId: null
+                , description: "", exampleName:"Test Name"
+                , exampleSize: 100, exampleDate: timestamp]).createOrUpdate()
     }
 
     def cleanup() {
@@ -35,15 +37,8 @@ class EntityFind extends Specification {
         ec.transaction.commit()
     }
 
-//    def "change tenant"() {
-//        when:
-//            ec.changeTenant("EXAMPLE1")
-//        then:
-//            ec.entity.makeFind("Example").count() > 0
-//    }
-
     @Unroll
-    def "find Example by single condition:#cond"() {
+    def "find Example by single condition (#fieldName = #value)"() {
         expect:
         EntityValue example = ec.entity.makeFind("Example").condition(fieldName, value).one()
         example != null
@@ -59,7 +54,7 @@ class EntityFind extends Specification {
     }
 
     @Unroll
-    def "find Example by operator condition:#cond"(){
+    def "find Example by operator condition (#fieldName #operator #value)"(){
         expect:
         EntityValue example = ec.entity.makeFind("Example").condition(fieldName, operator, value).one()
         example != null
@@ -67,6 +62,30 @@ class EntityFind extends Specification {
 
         where:
         fieldName | operator | value
-        "exampleId" | EntityCondition.ComparisonOperator.LIKE | "%EST%"
+        "exampleId" | EntityCondition.ComparisonOperator.BETWEEN | ["TEST0", "TEST2"]
+        "exampleId" | EntityCondition.ComparisonOperator.EQUALS | "TEST1"
+        "exampleId" | EntityCondition.ComparisonOperator.IN | ["TEST1"]
+        "exampleId" | EntityCondition.ComparisonOperator.LIKE | "%TEST1%"
     }
+
+    @Unroll
+    def "find Example by searchFormInputs (#inputsMap)"(){
+        expect:
+        ec.context.putAll(inputsMap)
+        EntityValue example = ec.entity.makeFind("Example").searchFormInputs("", "", false).one()
+        resultId ? example != null && example.exampleId == resultId : example == null
+
+        where:
+        inputsMap | resultId
+        [exampleId: "TEST1", exampleId_op: "equals"] | "TEST1"
+        [exampleId: "%TEST1%", exampleId_op: "like"] | "TEST1"
+        [exampleId: "TEST1", exampleId_op: "contains"] | "TEST1"
+        [exampleId: "TEST1", exampleId_op: "equals", exampleTypeEnumId_op: "empty"] | "TEST1"
+        [exampleId: "TEST1", exampleId_op: "equals", description_op: "empty"] | "TEST1"
+        [exampleId: "TEST1", exampleId_op: "equals", exampleDate_from: timestamp, exampleDate_thru: timestamp] | null
+        [exampleId: "TEST1", exampleId_op: "equals", exampleDate_from: timestamp, exampleDate_thru: timestamp + 1] | "TEST1"
+        [exampleId: "TEST1", exampleId_op: "equals", exampleName_not: "Y", exampleName_op: "equals", exampleName: ""] | "TEST1"
+        [exampleId: "TEST1", exampleId_op: "equals", exampleName_not: "Y", exampleName_op: "empty"] | "TEST1"
+    }
+
 }
