@@ -163,10 +163,9 @@ abstract class EntityFindBase implements EntityFind {
             // NOTE: do we need to do type conversion here?
 
             // this will handle text-find
-            Object value = inf.get(fn)
-            String op = inf.get(fn + "_op")
-            if (value != null || op != null) {
-                if (op == null) op = "contains"
+            if (inf.containsKey(fn) || inf.containsKey(fn + "_op")) {
+                Object value = inf.get(fn)
+                String op = inf.get(fn + "_op") ?: "contains"
                 boolean not = (inf.get(fn + "_not") == "Y")
                 boolean ic = (inf.get(fn + "_ic") == "Y")
 
@@ -175,49 +174,40 @@ abstract class EntityFindBase implements EntityFind {
                     case "equals":
                         if (value) {
                             ec = efi.conditionFactory.makeCondition(fn,
-                                    not ? EntityCondition.ComparisonOperator.NOT_EQUAL : EntityCondition.ComparisonOperator.EQUALS,
-                                    value)
+                                    not ? EntityCondition.NOT_EQUAL : EntityCondition.EQUALS, value)
                             if (ic) ec.ignoreCase()
                         }
                         break;
                     case "like":
                         if (value) {
                             ec = efi.conditionFactory.makeCondition(fn,
-                                    not ? EntityCondition.ComparisonOperator.NOT_LIKE : EntityCondition.ComparisonOperator.LIKE,
-                                    value)
+                                    not ? EntityCondition.NOT_LIKE : EntityCondition.LIKE, value)
                             if (ic) ec.ignoreCase()
                         }
                         break;
                     case "contains":
                         if (value) {
                             ec = efi.conditionFactory.makeCondition(fn,
-                                    not ? EntityCondition.ComparisonOperator.NOT_LIKE : EntityCondition.ComparisonOperator.LIKE,
-                                    "%${value}%")
+                                    not ? EntityCondition.NOT_LIKE : EntityCondition.LIKE, "%${value}%")
                             if (ic) ec.ignoreCase()
                         }
                         break;
                     case "empty":
                         ec = efi.conditionFactory.makeCondition(
                                 efi.conditionFactory.makeCondition(fn,
-                                        not ? EntityCondition.ComparisonOperator.NOT_EQUAL : EntityCondition.ComparisonOperator.EQUALS,
-                                        null),
+                                        not ? EntityCondition.NOT_EQUAL : EntityCondition.EQUALS, null),
                                 not ? EntityCondition.JoinOperator.AND : EntityCondition.JoinOperator.OR,
                                 efi.conditionFactory.makeCondition(fn,
-                                        not ? EntityCondition.ComparisonOperator.NOT_EQUAL : EntityCondition.ComparisonOperator.EQUALS,
-                                        ""))
+                                        not ? EntityCondition.NOT_EQUAL : EntityCondition.EQUALS, ""))
                         break;
                 }
                 if (ec != null) this.condition(ec)
             } else {
                 // these will handle range-find and date-find
-                String from = inf.get(fn + "_from");
-                String thru = inf.get(fn + "_thru");
-                if (from)
-                    this.condition(efi.conditionFactory.makeCondition(fn,
-                            EntityCondition.ComparisonOperator.GREATER_THAN_EQUAL_TO, from))
-                if (thru)
-                    this.condition(efi.conditionFactory.makeCondition(fn,
-                            EntityCondition.ComparisonOperator.LESS_THAN, thru))
+                if (inf.containsKey(fn + "_from")) this.condition(efi.conditionFactory.makeCondition(fn,
+                        EntityCondition.GREATER_THAN_EQUAL_TO, inf.get(fn + "_from")))
+                if (inf.containsKey(fn + "_thru")) this.condition(efi.conditionFactory.makeCondition(fn,
+                        EntityCondition.LESS_THAN, inf.get(fn + "_thru")))
             }
         }
 
