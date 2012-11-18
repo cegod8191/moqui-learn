@@ -44,13 +44,13 @@
     </transition>
 
     <actions>
-    	<if condition="context.renderMode == 'json'">
+    	<!--<if condition="context.renderMode == 'json'">-->
 	        <entity-find entity-name="Tutorial" list="tutorialList">
 	            <search-form-inputs/>
 	        </entity-find>
             <script>hasPermission = ec.user.hasPermission("100002")</script>
 	        <log level="info" message="===============hasPermission:${hasPermission}"/>
-    	</if>
+    	<!--</if>-->
     </actions>
  
     <widgets>

@@ -417,7 +417,7 @@ This Work includes contributions authored by David E. Jones, not as a
     ${sri.getAfterFormWriterText()}
     <#else>
         <#if type?has_content && type == "dataTables">
-            <@renderDataTables formNode />
+            <#--<@renderDataTables formNode />-->
         <#else>
         <div class="form-list-outer" id="${formNode["@name"]}-table">
         <div class="form-header-group">

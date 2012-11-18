@@ -82,6 +82,7 @@ This Work includes contributions authored by David E. Jones, not as a
                 <link url="login" text="Test Login (John Doe)">
                     <parameter name="username" value="john.doe"/>
                     <parameter name="password" value="moqui"/>
+                    <parameter name="tenantId" value="DEFAULT"/>
                 </link>
             </panel-center>
         </container-panel>
