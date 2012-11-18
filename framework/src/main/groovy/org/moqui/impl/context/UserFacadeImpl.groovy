@@ -44,6 +44,12 @@ class UserFacadeImpl implements UserFacade {
     protected EntityList internalArtifactTarpitCheckList = null
     protected EntityList internalArtifactAuthzCheckList = null
 
+    // these are used only when there is no logged in user
+    protected Locale internalLocale = null
+    protected TimeZone internalTimeZone = null
+    protected String internalCurrencyUomId = null
+    // TODO: if one of these is set before login, set it on the account on login?
+
     /** This is set instead of adding _NA_ user as logged in to pass authc tests but not generally behave as if a user is logged in */
     protected boolean loggedInAnonymous = false
 
@@ -204,6 +210,8 @@ class UserFacadeImpl implements UserFacade {
         if (this.username) {
             String localeStr = this.userAccount.locale
             if (localeStr) locale = new Locale(localeStr)
+        } else {
+            locale = internalLocale
         }
         return (locale ?: (request ? request.getLocale() : Locale.getDefault()))
     }
@@ -211,10 +219,19 @@ class UserFacadeImpl implements UserFacade {
     /** @see org.moqui.context.UserFacade#setLocale(Locale) */
     void setLocale(Locale locale) {
         if (this.username) {
-            eci.service.sync().name("update", "moqui.security.UserAccount")
-                    .parameters((Map<String, Object>) [userId:getUserId(), locale:locale.toString()]).call()
+            boolean alreadyDisabled = eci.getArtifactExecution().disableAuthz()
+            boolean beganTransaction = eci.transaction.begin(null)
+            try {
+                userAccount.set("locale", locale.toString())
+                userAccount.update()
+            } catch (Throwable t) {
+                eci.transaction.rollback(beganTransaction, "Error saving timeZone", t)
+            } finally {
+                if (eci.transaction.isTransactionInPlace()) eci.transaction.commit(beganTransaction)
+                if (!alreadyDisabled) eci.getArtifactExecution().enableAuthz()
+            }
         } else {
-            throw new IllegalStateException("No user logged in, can't set Locale")
+            internalLocale = locale
         }
     }
 
@@ -224,6 +241,8 @@ class UserFacadeImpl implements UserFacade {
         if (this.username) {
             String tzStr = this.userAccount.timeZone
             if (tzStr) tz = TimeZone.getTimeZone(tzStr)
+        } else {
+            tz = internalTimeZone
         }
         return tz ?: TimeZone.getDefault()
     }
@@ -231,23 +250,41 @@ class UserFacadeImpl implements UserFacade {
     /** @see org.moqui.context.UserFacade#setTimeZone(TimeZone) */
     void setTimeZone(TimeZone tz) {
         if (this.username) {
-            eci.service.sync().name("update", "moqui.security.UserAccount")
-                    .parameters((Map<String, Object>) [userId:getUserId(), timeZone:tz.getID()]).call()
+            boolean alreadyDisabled = eci.getArtifactExecution().disableAuthz()
+            boolean beganTransaction = eci.transaction.begin(null)
+            try {
+                userAccount.set("timeZone", tz.getID())
+                userAccount.update()
+            } catch (Throwable t) {
+                eci.transaction.rollback(beganTransaction, "Error saving timeZone", t)
+            } finally {
+                if (eci.transaction.isTransactionInPlace()) eci.transaction.commit(beganTransaction)
+                if (!alreadyDisabled) eci.getArtifactExecution().enableAuthz()
+            }
         } else {
-            throw new IllegalStateException("No user logged in, can't set Time Zone")
+            internalTimeZone = tz
         }
     }
 
     /** @see org.moqui.context.UserFacade#getCurrencyUomId() */
-    String getCurrencyUomId() { return this.username ? this.userAccount.currencyUomId : null }
+    String getCurrencyUomId() { return this.username ? this.userAccount.currencyUomId : internalCurrencyUomId }
 
     /** @see org.moqui.context.UserFacade#setCurrencyUomId(String) */
     void setCurrencyUomId(String uomId) {
         if (this.username) {
-            eci.service.sync().name("update", "moqui.security.UserAccount")
-                    .parameters((Map<String, Object>) [userId:getUserId(), currencyUomId:uomId]).call()
+            boolean alreadyDisabled = eci.getArtifactExecution().disableAuthz()
+            boolean beganTransaction = eci.transaction.begin(null)
+            try {
+                userAccount.set("currencyUomId", uomId)
+                userAccount.update()
+            } catch (Throwable t) {
+                eci.transaction.rollback(beganTransaction, "Error saving currencyUomId", t)
+            } finally {
+                if (eci.transaction.isTransactionInPlace()) eci.transaction.commit(beganTransaction)
+                if (!alreadyDisabled) eci.getArtifactExecution().enableAuthz()
+            }
         } else {
-            throw new IllegalStateException("No user logged in, can't set Currency")
+            internalCurrencyUomId = uomId
         }
     }
 
@@ -361,10 +398,15 @@ class UserFacadeImpl implements UserFacade {
         EntityValue ua = eci.getEntity().makeFind("moqui.security.UserAccount").condition("userId", username).useCache(true).one()
         if (ua == null) ua = eci.getEntity().makeFind("moqui.security.UserAccount").condition("username", username).useCache(true).one()
         if (ua == null) return false
-        return (eci.getEntity().makeFind("moqui.security.UserPermissionCheck").condition([userId:ua.userId, userPermissionId:userPermissionId])
-                .useCache(true).list()
-                .filterByDate("groupFromDate", "groupThruDate", nowTimestamp)
-                .filterByDate("permissionFromDate", "permissionThruDate", nowTimestamp)) as boolean
+        boolean alreadyDisabled = eci.getArtifactExecution().disableAuthz()
+        try {
+            return (eci.getEntity().makeFind("moqui.security.UserPermissionCheck")
+                    .condition([userId:ua.userId, userPermissionId:userPermissionId]).useCache(true).list()
+                    .filterByDate("groupFromDate", "groupThruDate", nowTimestamp)
+                    .filterByDate("permissionFromDate", "permissionThruDate", nowTimestamp)) as boolean
+        } finally {
+            if (!alreadyDisabled) eci.getArtifactExecution().enableAuthz()
+        }
     }
 
     /* @see org.moqui.context.UserFacade#isInGroup(String) */
@@ -440,7 +482,7 @@ class UserFacadeImpl implements UserFacade {
     EntityValue getUserAccount() {
         if (this.usernameStack.size() == 0) return null
         if (internalUserAccount == null) {
-            internalUserAccount = eci.getEntity().makeFind("moqui.security.UserAccount").condition("username", this.getUsername()).useCache(true).one()
+            internalUserAccount = eci.getEntity().makeFind("moqui.security.UserAccount").condition("username", this.getUsername()).useCache(false).one()
         }
         // logger.info("Got UserAccount [${internalUserAccount}] with userIdStack [${userIdStack}]")
         return internalUserAccount
