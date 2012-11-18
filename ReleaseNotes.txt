@@ -2,13 +2,14 @@
 Moqui Framework Release Notes
 
 ===========================================================================
-Release 1.2.0 - TBD
+Release 1.2.0 - 30 Nov 2012
 ===========================================================================
 
-Moqui Framework release 1.2.0 is a minor new feature release and includes
-a number of bug fixes too. This release has undergone significantly more
+Moqui Framework release 1.2.0 is a minor new feature release and a major
+quality improvement release. This release has undergone significantly more
 testing than previous releases because of a wider variety of functionality
-that has now been built and tested using the framework.
+that has now been built and tested using the framework, and because of a
+unit testing effort (framework unit tests built using Spock).
 
 The new features include popup menus (using the new jQueryUI menu widget),
 dynamic-options in XML Form drop-downs with dependency on other fields,
@@ -19,10 +20,10 @@ that generally make the framework easier to use and more reliable.
 
 There are some non-backward-compatible changes in this release including
 elimination of id-very-long from the data type dictionary (expanding the id
-and id-long types), and changed database configuration of subscreens to be
+and id-long types), change to database configuration of subscreens to be
 based on UserGroup instead of the individual UserAccount (this is a
 primary-key change and may require a database metadata update and data
-migration).
+migration), and context isolation for service calls.
 
 This release includes:
 
@@ -158,6 +159,10 @@ Bug Fixes:
   side-effects; this fixes a number of bugs
 - User login now works outside a web context
 - Fixed authz and tx issues with user preferences
+- Fixed issue with LocalizedEntityField because the code was still looking
+  for the basic entity name and not the full entity name
+- Fixed issue with parsing locale from the database to include separate
+  language and country codes (was ignoring the country)
 
 ===========================================================================
 Release 1.1.1 - 22 Sep 2012
