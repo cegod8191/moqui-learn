@@ -1,4 +1,4 @@
-<#include "classpath://template/DefaultScreenMacros.html.ftl"/>
+<#include "ScreenHtmlMacros.ftl"/>
 
 <#macro "render-mode">
 </#macro>
