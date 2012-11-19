@@ -40,7 +40,6 @@ class MoquiServlet extends HttpServlet {
     void doScreenRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         ExecutionContextFactory executionContextFactory =
                 (ExecutionContextFactory) getServletContext().getAttribute("executionContextFactory")
-        request.setCharacterEncoding("UTF-8")
         String moquiWebappName = getServletContext().getInitParameter("moqui-name")
 
         String pathInfo = request.getPathInfo()
