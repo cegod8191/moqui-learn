@@ -89,7 +89,7 @@ class ResourceFacadeTests extends Specification {
         expression | result
         "ec.tenantId" | ec.tenantId
         "null" | null
-        "undefined_variable" | null
+        "undefinedVariable" | null
     }
 
     @Unroll
