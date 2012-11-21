@@ -58,11 +58,17 @@
                 <button style="btn-small" click="ListUserAccount.submit()" validchecked="have">删除</button>
             </button-group>
         </toolbar>
-        <form-list name="ListUserAccount" list="listUserAccount" transition="deleteUserAccount"
+        <form-list name="ListUserAccount" list="listUserAccount" transition="deleteUserAccount" multi="true"
                    render="{'type':'dataTables', 'selectMode':'multi', 'toolbar': 'toolbarUserAccount', 'serverSide': true}">
-            <field name="userId" style="th-checkbox">
+            <row-actions>
+                <set field="checkbox" from="userId" />
+            </row-actions>
+            <field name="checkbox" style="th-checkbox">
                 <header-field title="" show-order-by="false"></header-field>
                 <default-field title=""><check></check></default-field>
+            </field>
+            <field name="userId">
+                <default-field><display /></default-field>
             </field>
             <field name="username">
                 <default-field><link url="editUserAccount" text="${username}" style="btn-small"/></default-field>

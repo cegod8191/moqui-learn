@@ -6,14 +6,18 @@
     <transition name="createUserGroup">
         <!-- service-call和actions之间只能2选一,优先service-call, 如果service-call存在则actions不会被执行 -->
         <actions>
-            <service-call name="create#UserGroup" out-map="outmap" />
-            <log level="info" message="=========== outmap: ${outmap}" />
+            <service-call name="create#UserGroup" in-map="context" out-map="outmap" />
         </actions>
         <default-response url="../EditUserGroup" parameter-map="outmap"/>
     </transition>
 
     <transition name="editUserGroup">
         <default-response url="../EditUserGroup"/>
+    </transition>
+
+    <transition name="deleteUserGroup">
+        <service-call name="delete#UserGroup" />
+        <default-response url="."></default-response>
     </transition>
 
     <actions>
@@ -45,14 +49,14 @@
                     <!--<menu-item name="item1" transition="createUserGroup"></menu-item>-->
                     <!--<menu-item name="item2" transition="createUserGroup"></menu-item>-->
                 <!--</menu>-->
-                <button style="btn-small" click="ListUserGroup.submit()" validchecked="1">修改</button>
+                <button style="btn-small" click="ListUserGroup.submit()" validchecked="have">删除</button>
             </button-group>
         </toolbar>
-        <form-list name="ListUserGroup" list="listUserGroup" render="{'type':'dataTables', 'selectMode':'single', 'toolbar': 'toolbarUserGroup'}">
+        <form-list name="ListUserGroup" list="listUserGroup" transition="deleteUserGroup" multi="true"
+                   render="{'type':'dataTables', 'selectMode':'multi', 'toolbar': 'toolbarUserGroup'}">
             <row-actions>
-                <set field="checkbox" from="userGroupId"/>
             </row-actions>
-            <field name="checkbox" style="th-checkbox">
+            <field name="userGroupId" style="th-checkbox">
                 <header-field title="" show-order-by="false"></header-field>
                 <default-field title=""><check></check></default-field>
             </field>
@@ -64,6 +68,7 @@
         <!--<container style="clearfix"></container>-->
         <container-dialog id="CreateUserGroupDialog" button-text="建立新用户组" style="btn-primary">
             <form-single name="CreateUserGroup" transition="createUserGroup">
+                <field name="userGroupId"><default-field><text-line /></default-field></field>
                 <field name="description"><default-field><text-line /></default-field></field>
                 <field name="submitButton">
                     <default-field title="Create"><submit style="btn-primary"/></default-field>

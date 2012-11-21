@@ -45,13 +45,13 @@
                     <field-map field-name="userId" />
                     <field-map field-name="userGroupId" from="userGroupId" />
                 </entity-find-one>
-                <set field="checkedUserGroupId" from="userGroupMember?userGroupMember.userGroupId:''"/>
+                <set field="checkbox" from="userGroupMember?userGroupMember.userGroupId:''"/>
                 <set field="fromDate" from="userGroupMember?userGroupMember.fromDate:''"/>
                 <set field="thruDate" from="userGroupMember?userGroupMember.thruDate:''"/>
             </row-actions>
-            <field name="checkedUserGroupId" style="th-checkbox">
+            <field name="checkbox" style="th-checkbox">
                 <header-field title="" show-order-by="false"></header-field>
-                <default-field title=""><check><option key="${checkedUserGroupId}" text=" "/></check></default-field>
+                <default-field title=""><check><option key="${checkbox}" text=" "/></check></default-field>
             </field>
             <field name="userGroupId" hide=""><default-field title="用户组编号"><display/></default-field></field>
             <field name="description"><default-field title="用户组"><display/></default-field></field>

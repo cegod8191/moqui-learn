@@ -17,6 +17,6 @@ This Work includes contributions authored by David E. Jones, not as a
     <subscreens default-item="FindUserPermission"/>
 
     <widgets>
-        <subscreens-panel id="userpermission-panel" type="tab" dynamic="false"/>
+        <subscreens-panel id="user-permission-panel" type="tab" dynamic="false"/>
     </widgets>
 </screen>
