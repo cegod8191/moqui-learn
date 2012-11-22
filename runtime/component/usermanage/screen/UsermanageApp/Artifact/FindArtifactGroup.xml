@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-1.2.xsd"
+        default-menu-include="false" default-menu-title="程序资源组管理">
+
+    <transition name="createArtifactGroup">
+        <!-- service-call和actions之间只能2选一,优先service-call, 如果service-call存在则actions不会被执行 -->
+        <actions>
+            <service-call name="create#ArtifactGroup" in-map="context" out-map="outmap" />
+        </actions>
+        <default-response url="../EditArtifactGroup" parameter-map="outmap"/>
+    </transition>
+
+    <transition name="editArtifactGroup">
+        <default-response url="../EditArtifactGroup"/>
+    </transition>
+
+    <actions>
+        <if condition="context.renderMode == 'json'">
+            <entity-find entity-name="ArtifactGroup" list="listArtifactGroup">
+                <search-form-inputs/>
+            </entity-find>
+        </if>
+    </actions>
+
+    <widgets>
+
+        <form-single name="FindArtifactGroup">
+            <!-- <field name="tutorialId"><default-field><text-find/></default-field></field>
+                -->
+            <auto-fields-entity entity-name="ArtifactGroup" field-type="find"/>
+            <field name="searchButton"><default-field title="Find"><submit style="btn-primary" for="ListArtifactGroup"/></default-field></field>
+        </form-single>
+
+        <toolbar id="toolbarArtifactGroup">
+            <button-group>
+                <button style="btn-small" click="dataTablesSelectAll('ListArtifactGroup')">全选</button>
+                <button style="btn-small" click="dataTablesReverseSelect('ListArtifactGroup')">反选</button>
+            </button-group>
+
+            <button-group>
+                <button style="btn-small" click="ListArtifactGroup.submit()" validchecked="1">修改</button>
+            </button-group>
+        </toolbar>
+        <form-list name="ListArtifactGroup" list="listArtifactGroup" render="{'type':'dataTables', 'selectMode':'single', 'toolbar': 'toolbarArtifactGroup'}">
+            <row-actions>
+                <set field="checkbox" from="artifactGroupId"/>
+            </row-actions>
+            <field name="checkbox" style="th-checkbox">
+                <header-field title="" show-order-by="false"></header-field>
+                <default-field title=""><check></check></default-field>
+            </field>
+            <field name="artifactGroupId"><default-field><link url="editArtifactGroup" text="${artifactGroupId}"/></default-field></field>
+            <field name="description"><default-field>
+                <display/>
+            </default-field></field>
+        </form-list>
+
+        <container-dialog id="CreateArtifactGroupDialog" button-text="建立新程序资源组" style="btn-primary">
+            <form-single name="CreateArtifactGroup" transition="createArtifactGroup">
+                <field name="description"><default-field><text-line /></default-field></field>
+                <field name="submitButton">
+                    <default-field title="Create"><submit style="btn-primary"/></default-field>
+                </field>
+            </form-single>
+        </container-dialog>
+    </widgets>
+</screen>

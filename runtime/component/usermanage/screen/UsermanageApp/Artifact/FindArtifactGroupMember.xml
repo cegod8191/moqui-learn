@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns=""
+        xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-1.2.xsd"
+        default-menu-title="程序资源组内容" default-menu-index="2">
+    <!-- tab页上面的参数 -->
+    <parameter name="artifactGroupId"/>
+
+    <transition name="deleteArtifactGroupMember">
+        <service-call name="usermanage.user.UserServices.deleteArtifactGroupMember"/>
+        <default-response url="."/>
+    </transition>
+
+    <transition name="addArtifactGroupMember">
+        <service-call name="create#ArtifactGroupMember"/>
+        <default-response url="."/>
+    </transition>
+
+    <actions>
+        <entity-find entity-name="ArtifactGroupMember" list="listArtifactGroupMember">
+            <econdition field-name="artifactGroupId" />
+        </entity-find>
+        <!-- 在未用<search-form-inputs/>的情况下,需要entity-find-count,否则取不到总记录数,模板"count = context[listName + "Count"]"会报错 -->
+        <!-- count变量命名规则必须未list名+Count -->
+        <entity-find-count entity-name="ArtifactGroupMember" count-field="listArtifactGroupMemberCount">
+            <econdition field-name="artifactGroupId" />
+        </entity-find-count>
+    </actions>
+
+    <widgets>
+        <!--<nav style="nav-pills" trigger="hover">-->
+            <!--<menu name="menu1" title="测试">-->
+                <!--<menu-item name="menu2" title="updateUserMemberGroup" transition="updateUserMemberGroup"></menu-item>-->
+            <!--</menu>-->
+        <!--</nav>-->
+        <toolbar id="toolbarArtifactGroupMember">
+            <button-group>
+                <button style="btn-small" click="dataTablesSelectAll('ListArtifactGroupMember')">全选</button>
+                <button style="btn-small" click="dataTablesReverseSelect('ListArtifactGroupMember')">反选</button>
+            </button-group>
+
+            <button-group>
+                <button id="buttonDelete" style="btn-small" click="ListArtifactGroupMember.submit()" validchecked="have">删除所选程序资源</button>
+            </button-group>
+
+            <container-dialog id="AddArtifactGroupMemberDialog" button-text="新增程序资源" style="btn-primary btn-small">
+                <form-single name="AddArtifactGroupMember" transition="addArtifactGroupMember">
+                    <field name="artifactTypeEnumId">
+                        <default-field title="程序类型">
+                            <drop-down>
+                                <entity-options text="${description}">
+                                    <entity-find entity-name="Enumeration">
+                                        <econdition field-name="enumTypeId" value="ArtifactType"/>
+                                    </entity-find>
+                                </entity-options>
+                            </drop-down>
+                        </default-field>
+                    </field>
+                    <field name="artifactName"><default-field>
+                        <text-line />
+                    </default-field></field>
+                    <field name="nameIsPattern"><default-field title=""><check><option key="Y" text="artifact name is pattern?"/></check></default-field></field>
+                    <field name="inheritAuthz"><default-field title=""><check><option key="Y" text="inherit authz?"/></check></default-field></field>
+                    <field name="artifactGroupId" hide="true"><default-field>
+                        <hidden />
+                    </default-field></field>
+                    <field name="submitButton">
+                        <default-field title="Create"><submit style="btn-primary"/></default-field>
+                    </field>
+                </form-single>
+            </container-dialog>
+        </toolbar>
+        <form-list name="ListArtifactGroupMember" list="listArtifactGroupMember" transition="deleteArtifactGroupMember" multi="true"
+            render="{'type':'dataTables', 'selectMode':'multi', 'toolbar': 'toolbarArtifactGroupMember', 'serverSide': true, 'pageSize': 100}">
+            <row-actions>
+            </row-actions>
+            <field name="checkbox" style="th-checkbox">
+                <header-field title="" show-order-by="false"></header-field>
+                <default-field title=""><check></check></default-field>
+            </field>
+            <field name="artifactName" hide=""><default-field><display /></default-field></field>
+            <field name="artifactTypeEnumId" hide=""><default-field><display /></default-field></field>
+            <field name="nameIsPattern"><default-field><display /></default-field></field>
+            <field name="inheritAuthz"><default-field><display /></default-field></field>
+        </form-list>
+    </widgets>
+</screen>
