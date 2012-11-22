@@ -1,6 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <services xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/service-definition-1.2.xsd">
+    <!-- 删除用户组 -->
+    <service verb="deleteUserGroup" type="inline">
+        <in-parameters>
+        <parameter name="checkbox" />
+        <parameter name="userGroupId" />
+        </in-parameters>
+        <out-parameters>
+        </out-parameters>
+        <actions>
+            <if condition="checkbox!=null">
+                <entity-delete-by-condition entity-name="UserGroupMember">
+                    <econdition field-name="userGroupId" from="context.userGroupId" />
+                </entity-delete-by-condition>
+                <entity-make-value entity-name="UserGroup" value-field="userGroup" map="context" />
+                <entity-delete value-field="userGroup" />
+            </if>
+        </actions>
+    </service>
+
     <!-- 更新用户的所属用户组 -->
     <service verb="updateUserMemberGroup" type="inline">
         <in-parameters>
@@ -19,14 +38,14 @@
             </entity-find-one>
             <!-- 如果不存在且选中状态,则新增记录 -->
             <if condition="foundUserGroupMember==null">
-                <if condition="context.checkbox!=null">
+                <if condition="checkbox!=null">
                     <entity-make-value entity-name="UserGroupMember" value-field="newUserGroupMember" map="context" />
                     <set field="newUserGroupMember.fromDate" from="ec.user.getNowTimestamp()"/>
                     <entity-create value-field="newUserGroupMember" />
                 </if>
             <else>
                 <!-- 如果原记录存在且未选中状态,则删除记录 -->
-                <if condition="context.checkbox==null">
+                <if condition="checkbox==null">
                     <entity-delete value-field="foundUserGroupMember" />
                 <else>
                     <!-- 如果记录存在且起始时间有变化,则先删除再新增 -->
@@ -96,7 +115,7 @@
         <out-parameters>
         </out-parameters>
         <actions>
-            <if condition="context.checkbox">
+            <if condition="checkbox">
                 <entity-delete-by-condition entity-name="UserGroupMember">
                     <econdition field-name="userId" from="context.userId" />
                 </entity-delete-by-condition>
@@ -134,7 +153,7 @@
         <out-parameters>
         </out-parameters>
         <actions>
-            <if condition="context.checkbox != null">
+            <if condition="checkbox != null">
                 <entity-delete-by-condition entity-name="UserGroupPermission">
                     <econdition field-name="userPermissionId" from="context.userPermissionId" />
                 </entity-delete-by-condition>
@@ -152,7 +171,7 @@
         <out-parameters>
         </out-parameters>
         <actions>
-            <if condition="context.checkbox != null">
+            <if condition="checkbox != null">
                 <entity-delete-by-condition entity-name="UserPermission">
                     <econdition field-name="userPermissionId" from="context.userPermissionId" />
                 </entity-delete-by-condition>
@@ -160,6 +179,25 @@
                 <entity-make-value entity-name="UserPermission" value-field="updateUserPermission" map="context"/>
                 <entity-update value-field="updateUserPermission" />
             </else>
+            </if>
+        </actions>
+    </service>
+
+    <!-- 删除程序资源组成员 -->
+    <service verb="deleteArtifactGroupMember" type="inline">
+        <in-parameters>
+            <parameter name="checkbox" />
+            <parameter name="artifactGroupId" />
+            <parameter name="artifactName" />
+            <parameter name="artifactTypeEnumId" />
+            <parameter name="nameIsPattern" />
+        </in-parameters>
+        <out-parameters>
+        </out-parameters>
+        <actions>
+            <if condition="checkbox != null">
+                <entity-make-value entity-name="ArtifactGroupMember" value-field="artifactGroupMember" map="context" />
+                <entity-delete value-field="artifactGroupMember" />
             </if>
         </actions>
     </service>

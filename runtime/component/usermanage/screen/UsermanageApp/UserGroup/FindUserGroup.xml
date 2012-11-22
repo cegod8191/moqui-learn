@@ -16,7 +16,7 @@
     </transition>
 
     <transition name="deleteUserGroup">
-        <service-call name="delete#UserGroup" />
+        <service-call name="usermanage.user.UserServices.deleteUserGroup" />
         <default-response url="."></default-response>
     </transition>
 
@@ -55,12 +55,14 @@
         <form-list name="ListUserGroup" list="listUserGroup" transition="deleteUserGroup" multi="true"
                    render="{'type':'dataTables', 'selectMode':'multi', 'toolbar': 'toolbarUserGroup'}">
             <row-actions>
+                <set field="checkbox" from="userGroupId" />
             </row-actions>
-            <field name="userGroupId" style="th-checkbox">
+            <field name="checkbox" style="th-checkbox">
                 <header-field title="" show-order-by="false"></header-field>
                 <default-field title=""><check></check></default-field>
             </field>
-            <field name="userGroupId"><default-field><link url="editUserGroup" text="${userGroupId}"/></default-field></field>
+            <field name="userGroupId2"><default-field><link url="editUserGroup" text="${userGroupId}"/></default-field></field>
+            <field name="userGroupId"><default-field><display /></default-field></field>
             <field name="description"><default-field>
                 <display/>
             </default-field></field>
