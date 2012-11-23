@@ -5,6 +5,11 @@
     <!-- tab页上面的参数 -->
     <parameter name="userGroupId"/>
 
+    <transition name="updateGroupPermission">
+        <service-call name="update#UserGroupPermission"/>
+        <default-response url="."></default-response>
+    </transition>
+
     <transition name="deleteGroupPermission">
         <service-call name="usermanage.user.UserServices.deleteGroupPermission"/>
         <default-response url="."/>
@@ -55,6 +60,7 @@
 
             <button-group>
                 <button id="buttonDelete" style="btn-small" click="ListGroupPermission.submit()" validchecked="have">删除所选权限</button>
+                <button id="buttonDelete" style="btn-small" click="ListGroupPermission.submit(this)" transition="updateGroupPermission">保存权限更改</button>
             </button-group>
 
             <container-dialog id="AddGroupPermissionDialog" button-text="添加授权资源" style="btn-primary btn-small">
@@ -88,7 +94,7 @@
             </field>
             <field name="userPermissionId"><default-field title="授权编号"><display/></default-field></field>
             <field name="description"><default-field title="授权资源名称"><display/></default-field></field>
-            <field name="fromDate"><default-field><date-time /></default-field></field>
+            <field name="fromDate"><default-field><display /></default-field></field>
             <field name="thruDate"><default-field><date-time /></default-field></field>
         </form-list>
     </widgets>

@@ -9,6 +9,9 @@ this Work and assume any risks associated with your use of this Work.
 This Work includes contributions authored by David E. Jones, not as a
 "work for hire", who hereby disclaims any copyright to the same.
 -->
+<#-- 解决时间戳作为条件提交后缺少毫秒的问题 -->
+<#setting datetime_format="yyyy-MM-dd HH:mm:ss.SSS"/>
+
 
 <#include "classpath://template/DefaultScreenMacros.html.ftl"/>
 
@@ -612,9 +615,14 @@ This Work includes contributions authored by David E. Jones, not as a
 			// 		        this.insertBefore(  nCloneTd.cloneNode( true ), this.childNodes[0] );
 			// 		    } );
 			var form = window.${formNode["@name"]} = $('#${formNode["@name"]}-form');
-            form.submit = function(){
+            form.submit = function(button){
                 //alert(this + 'submit');
-                this.get(0).submit();
+                var form = this.get(0);
+                var url = $(button).attr('transition')
+                if (url){
+                    form.action = url;
+                }
+                form.submit();
             }
 		    window.${formNode["@name"]}Table = $('#${formNode["@name"]}').dataTable( {
 		        "bProcessing": true,
@@ -1040,12 +1048,17 @@ This Work includes contributions authored by David E. Jones, not as a
     <#assign validchecked = .node["@validchecked"]?if_exists>
     <#assign id = .node["@id"]?if_exists>
     <#assign tooltip = .node["@tooltip"]?if_exists>
-	<button
+    <#assign transition = .node["@transition"]?if_exists>
+    <#if transition?has_content>
+        <#assign urlInfo = sri.makeUrlByType(transition, "transition", null)>
+    </#if>
+    <button
         <#t><#if id?has_content> id="${id}"</#if>
         <#t><#if validchecked?has_content> validchecked="${validchecked}" disabled="disabled"</#if>
         <#t><#if tooltip?has_content> title="${tooltip}"</#if>
         <#t> class="btn<#if fieldStyle?has_content> ${fieldStyle}</#if>"
         <#t><#if click?has_content> onclick="${click}"</#if>
+        <#t><#if urlInfo?has_content> transition="${urlInfo.url}"</#if>
         <#t>><#recurse>
     </button>
     <#if tooltip?has_content && id?has_content>

@@ -72,6 +72,7 @@
         </actions>
     </service>
 
+    <!-- 增加用户组成员 -->
     <service verb="addGroupMember" type="inline">
         <in-parameters>
             <parameter name="userId"/>
@@ -138,7 +139,6 @@
                 <set field="context.fromDate" from="ec.user.getNowTimestamp()"/>
                 <entity-make-value entity-name="UserGroupPermission" value-field="newUserGroupPermission" map="context"/>
                 <entity-create value-field="newUserGroupPermission" />
-                <log level="info" message="========= context: ${context}" />
             </if>
         </actions>
     </service>
