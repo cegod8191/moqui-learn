@@ -673,7 +673,12 @@ This Work includes contributions authored by David E. Jones, not as a
 					aoData.push( { "name": "_FORM_", "value":  "${formNode["@name"]}"} );
 					aoData.push( { "name": "renderMode", "value":  "json"} );
 					aoData.push( { "name": "lastStandalone", "value":  "true"} );
-					var search_form = this.data('search_form');
+                    <#if parameterMap?has_content>
+                        <#list (parameterMap.keySet())?if_exists as key>
+                            aoData.push( { "name": "${key}", "value": "${parameterMap.get(key)}"} );
+                        </#list>
+                    </#if>
+                    var search_form = this.data('search_form');
 					convertDataTablesParameters(aoData, search_form);
 				},
 		        "aoColumns": [
