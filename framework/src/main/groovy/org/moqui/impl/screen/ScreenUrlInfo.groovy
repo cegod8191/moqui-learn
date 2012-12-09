@@ -41,7 +41,7 @@ class ScreenUrlInfo {
     boolean alwaysUseFullPath = false
     boolean beginTransaction = false
 
-    /** The full path name list for the URL */
+    /** The full path name list for the URL, including extraPathNameList */
     List<String> fullPathNameList = null
 
     /** The minimal path name list for the URL, basically without following the defaults */
@@ -153,6 +153,13 @@ class ScreenUrlInfo {
         return urlBuilder.toString()
     }
 
+    String getScreenPathUrl() {
+        StringBuilder urlBuilder = new StringBuilder(baseUrl)
+        for (String pathName in this.preTransitionPathNameList) urlBuilder.append('/').append(pathName)
+        return urlBuilder.toString()
+    }
+
+    List<String> getPreTransitionPathNameList() { return preTransitionPathNameList }
     List<String> getExtraPathNameList() { return extraPathNameList }
 
     Map<String, String> getParameterMap() {

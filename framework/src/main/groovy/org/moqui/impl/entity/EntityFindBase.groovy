@@ -470,7 +470,7 @@ abstract class EntityFindBase implements EntityFind {
         if (doCache) {
             entityOneCache.put(whereCondition, newEntityValue)
             // need to register an RA just in case the condition was not actually a primary key
-            efi.registerCacheOneRa(this.entityName, whereCondition, newEntityValue)
+            efi.registerCacheOneRa(this.entityName, whereCondition, (EntityValueBase) newEntityValue)
         }
 
         if (logger.traceEnabled) logger.trace("Find one on entity [${ed.entityName}] with condition [${whereCondition}] found value [${newEntityValue}]")
@@ -605,16 +605,16 @@ abstract class EntityFindBase implements EntityFind {
         EntityConditionImplBase whereCondition = (EntityConditionImplBase) getWhereEntityCondition()
         EntityConditionImplBase viewWhere = ed.makeViewWhereCondition()
         if (whereCondition && viewWhere) {
-            whereCondition =
-                (EntityConditionImplBase) efi.getConditionFactory().makeCondition(whereCondition, EntityCondition.JoinOperator.AND, viewWhere)
+            whereCondition = (EntityConditionImplBase) efi.getConditionFactory().makeCondition(whereCondition,
+                    EntityCondition.JoinOperator.AND, viewWhere)
         } else if (viewWhere) {
             whereCondition = viewWhere
         }
         EntityConditionImplBase havingCondition = (EntityConditionImplBase) getHavingEntityCondition()
         EntityConditionImplBase viewHaving = ed.makeViewHavingCondition()
         if (havingCondition && viewHaving) {
-            havingCondition =
-                (EntityConditionImplBase) efi.getConditionFactory().makeCondition(havingCondition, EntityCondition.JoinOperator.AND, viewHaving)
+            havingCondition = (EntityConditionImplBase) efi.getConditionFactory().makeCondition(havingCondition,
+                        EntityCondition.JoinOperator.AND, viewHaving)
         } else if (viewHaving) {
             havingCondition = viewHaving
         }
@@ -745,7 +745,7 @@ abstract class EntityFindBase implements EntityFind {
         // NOTE: consider expanding this to do a bulk delete in the DB if there are no EECAs for the entity
         this.useCache(false).forUpdate(true)
         this.resultSetConcurrency(ResultSet.CONCUR_UPDATABLE)
-        EntityListIterator eli
+        EntityListIterator eli = null
         long totalDeleted = 0
         try {
             eli = iterator()
@@ -754,7 +754,7 @@ abstract class EntityFindBase implements EntityFind {
                 totalDeleted++
             }
         } finally {
-            eli.close()
+            if (eli != null) eli.close()
         }
         return totalDeleted
     }

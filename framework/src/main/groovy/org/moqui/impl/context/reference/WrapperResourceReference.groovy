@@ -16,9 +16,8 @@ import org.moqui.context.ResourceReference
 import org.moqui.impl.StupidUtilities
 import org.moqui.impl.context.ExecutionContextImpl
 
-class WrapperResourceReference implements ResourceReference {
+class WrapperResourceReference extends BaseResourceReference  {
     ResourceReference rr = null
-    ExecutionContext ec = null
 
     WrapperResourceReference() { }
     
@@ -34,12 +33,9 @@ class WrapperResourceReference implements ResourceReference {
     }
 
     String getLocation() { return rr.getLocation() }
-    URI getUri() { return rr.getUri() }
-    String getFileName() { rr.getFileName() }
 
     InputStream openStream() { return rr.openStream() }
     String getText() { return rr.getText() }
-    String getContentType() { return rr.getContentType() }
 
     boolean supportsAll() { return rr.supportsAll() }
 
@@ -57,8 +53,10 @@ class WrapperResourceReference implements ResourceReference {
     boolean supportsLastModified() { return rr.supportsLastModified() }
     long getLastModified() { return rr.getLastModified() }
 
-    void destroy() { rr.destroy() }
+    boolean supportsWrite() { return rr.supportsWrite() }
+    void putText(String text) { rr.putText(text) }
+    void putStream(InputStream stream) { rr.putStream(stream) }
+    void move(String newLocation) { rr.move(newLocation) }
 
-    @Override
-    String toString() { rr?.toString() ?: "[no location (${this.class.getName()})]" }
+    void destroy() { rr.destroy() }
 }
