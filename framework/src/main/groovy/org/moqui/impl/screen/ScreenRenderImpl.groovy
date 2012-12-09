@@ -96,7 +96,15 @@ class ScreenRenderImpl implements ScreenRender {
 
     ScreenRender rootScreenFromHost(String host) {
         for (Node rootScreenNode in getWebappNode()."root-screen") {
-            if (host.matches((String) rootScreenNode."@host")) return this.rootScreen(rootScreenNode."@location")
+            def matcher = host =~ rootScreenNode."@host"
+            if (matcher.matches()){
+                def group_count = matcher.groupCount()
+                for(int i = 0; i <= group_count; i ++){
+                    ec.context.put("host_match_" + i, matcher.group(i))
+                }
+                return this.rootScreen(rootScreenNode."@location")
+            }
+            //if (host.matches((String) rootScreenNode."@host")) return this.rootScreen(rootScreenNode."@location")
         }
         throw new BaseException("Could not find root screen for host [${host}]")
     }
