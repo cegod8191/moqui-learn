@@ -124,7 +124,13 @@ class ContentResourceReference implements ResourceReference {
     boolean supportsLastModified() { return false }
     long getLastModified() {
         // TODO: more research to see if we can get a last modified time
-        System.currentTimeMillis()
+        javax.jcr.Node node = getNode()
+        if (node == null) return null
+        javax.jcr.Node contentNode = node.getNode("jcr:content")
+        if (contentNode == null) throw new IllegalArgumentException("Cannot get stream for content at [${repositoryName}][${nodePath}], has no jcr:content child node")
+        Property lastModifiedProperty = contentNode.getProperty("jcr:lastModified")
+        lastModifiedProperty.date.timeInMillis
+        //System.currentTimeMillis()
     }
 
     @Override
