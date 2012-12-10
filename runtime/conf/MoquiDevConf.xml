@@ -43,7 +43,8 @@
         <webapp name="webroot" http-port="" http-host=""
                 https-port="" https-host="" https-enabled="false"
                 content-prefix-secure="" content-prefix-standard="" cookie-domain="">
-            <root-screen host=".*" location="component://webroot/screen/webroot.xml"/>
+            <root-screen host="localhost" location="component://webroot/screen/webroot.xml"/>
+            <root-screen host="(\w+)\.localhost" location="component://webroot/screen/webroot.xml"/>
         </webapp>
     </webapp-list>
 
