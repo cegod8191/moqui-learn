@@ -12,6 +12,7 @@
 package org.moqui.context;
 
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
 import java.net.URL;
 import java.util.List;
@@ -41,12 +42,18 @@ public interface ResourceReference {
     boolean isFile();
     boolean isDirectory();
     List<ResourceReference> getDirectoryEntries();
+    ResourceReference findChildFile(String relativePath);
 
     boolean supportsExists();
     boolean getExists();
 
     boolean supportsLastModified();
     long getLastModified();
+
+    boolean supportsWrite();
+    void putText(String text);
+    void putStream(InputStream stream);
+    void move(String newLocation);
 
     void destroy();
 }

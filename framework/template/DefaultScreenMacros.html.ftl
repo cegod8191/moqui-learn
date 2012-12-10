@@ -161,17 +161,19 @@ This Work includes contributions authored by David E. Jones, not as a
         <#if .node["panel-header"]?has_content>
         <div<#if .node["@id"]?has_content> id="${.node["@id"]}-header"</#if> class="panel-header ui-helper-clearfix"><#recurse .node["panel-header"][0]>
         </div></#if>
-        <#if .node["panel-left"]?has_content>
-        <#-- LATER <xs:attribute name="draggable" default="false" type="boolean"/> -->
-        <div<#if .node["@id"]?has_content> id="${.node["@id"]}-left"</#if> class="panel-left"><#recurse .node["panel-left"][0]>
-        </div></#if>
-        <#if .node["panel-right"]?has_content>
-        <div<#if .node["@id"]?has_content> id="${.node["@id"]}-right"</#if> class="panel-right"><#recurse .node["panel-right"][0]>
-        </div></#if>
-        <div<#if .node["@id"]?has_content> id="${.node["@id"]}-center"</#if> class="panel-center"><#recurse .node["panel-center"][0]>
+        <div class="ui-helper-clearfix">
+            <#if .node["panel-left"]?has_content>
+            <#-- LATER <xs:attribute name="draggable" default="false" type="boolean"/> -->
+            <div<#if .node["@id"]?has_content> id="${.node["@id"]}-left"</#if> class="panel-left"><#recurse .node["panel-left"][0]>
+            </div></#if>
+            <#if .node["panel-right"]?has_content>
+            <div<#if .node["@id"]?has_content> id="${.node["@id"]}-right"</#if> class="panel-right"><#recurse .node["panel-right"][0]>
+            </div></#if>
+            <#assign centerClass><#if .node["panel-left"]?has_content><#if .node["panel-right"]?has_content>panel-center-both<#else>panel-center-left</#if><#else><#if .node["panel-right"]?has_content>panel-center-right<#else>panel-center-only</#if></#if></#assign>
+            <div<#if .node["@id"]?has_content> id="${.node["@id"]}-center"</#if> class="${centerClass}"><#recurse .node["panel-center"][0]>
+            </div>
         </div>
         <#if .node["panel-footer"]?has_content>
-        <div class="ui-helper-clearfix"></div>
         <div<#if .node["@id"]?has_content> id="${.node["@id"]}-footer"</#if> class="panel-footer"><#recurse .node["panel-footer"][0]>
         </div></#if>
     </div>
@@ -221,10 +223,11 @@ ${sri.renderIncludeScreen(.node["@location"], .node["@share-scope"]?if_exists)}
     </#if>
     <#if textToUse?exists>
         <#if textToUse["@location"]?has_content>
-<#if sri.doBoundaryComments()><!-- BEGIN render-mode.text[@location=${textToUse["@location"]}][@template=${textToUse["@template"]?default("true")}] --></#if>
+        <#assign textLocation = ec.resource.evaluateStringExpand(textToUse["@location"], "")>
+<#if sri.doBoundaryComments()><!-- BEGIN render-mode.text[@location=${textLocation}][@template=${textToUse["@template"]?default("true")}] --></#if>
     <#-- NOTE: this still won't encode templates that are rendered to the writer -->
-    <#if .node["@encode"]!"false" == "true">${sri.renderText(textToUse["@location"], textToUse["@template"]?if_exists)?html}<#else/>${sri.renderText(textToUse["@location"], textToUse["@template"]?if_exists)}</#if>
-<#if sri.doBoundaryComments()><!-- END   render-mode.text[@location=${textToUse["@location"]}][@template=${textToUse["@template"]?default("true")}] --></#if>
+    <#if .node["@encode"]!"false" == "true">${sri.renderText(textLocation, textToUse["@template"]?if_exists)?html}<#else>${sri.renderText(textLocation, textToUse["@template"]?if_exists)}</#if>
+<#if sri.doBoundaryComments()><!-- END   render-mode.text[@location=${textLocation}][@template=${textToUse["@template"]?default("true")}] --></#if>
         </#if>
         <#assign inlineTemplateSource = textToUse?string/>
         <#if inlineTemplateSource?has_content>
@@ -232,8 +235,8 @@ ${sri.renderIncludeScreen(.node["@location"], .node["@share-scope"]?if_exists)}
           <#if !textToUse["@template"]?has_content || textToUse["@template"] == "true">
             <#assign inlineTemplate = [inlineTemplateSource, sri.getActiveScreenDef().location + ".render_mode.text"]?interpret>
             <@inlineTemplate/>
-          <#else/>
-            <#if .node["@encode"]!"false" == "true">${inlineTemplateSource?html}<#else/>${inlineTemplateSource}</#if>
+          <#else>
+            <#if .node["@encode"]!"false" == "true">${inlineTemplateSource?html}<#else>${inlineTemplateSource}</#if>
           </#if>
 <#if sri.doBoundaryComments()><!-- END   render-mode.text[inline][@template=${textToUse["@template"]?default("true")}] --></#if>
         </#if>
@@ -721,7 +724,7 @@ ${sri.renderIncludeScreen(.node["@location"], .node["@share-scope"]?if_exists)}
 
 <#macro fieldName widgetNode><#assign fieldNode=widgetNode?parent?parent/>${fieldNode["@name"]?html}<#if isMulti?exists && isMulti && listEntryIndex?exists>_${listEntryIndex}</#if></#macro>
 <#macro fieldId widgetNode><#assign fieldNode=widgetNode?parent?parent/>${fieldNode?parent["@name"]}_${fieldNode["@name"]}<#if listEntryIndex?exists>_${listEntryIndex}</#if></#macro>
-<#macro fieldTitle fieldSubNode><#assign titleValue><#if fieldSubNode["@title"]?has_content>${ec.resource.evaluateStringExpand(fieldSubNode["@title"], "")}<#else/><#list fieldSubNode?parent["@name"]?split("(?=[A-Z])", "r") as nameWord>${nameWord?cap_first?replace("Id", "ID")}<#if nameWord_has_next> </#if></#list></#if></#assign>${ec.l10n.getLocalizedMessage(titleValue)}</#macro>
+<#macro fieldTitle fieldSubNode><#assign titleValue><#if fieldSubNode["@title"]?has_content>${ec.resource.evaluateStringExpand(fieldSubNode["@title"], "")}<#else><#list fieldSubNode?parent["@name"]?split("(?=[A-Z])", "r") as nameWord>${nameWord?cap_first?replace("Id", "ID")}<#if nameWord_has_next> </#if></#list></#if></#assign>${ec.l10n.getLocalizedMessage(titleValue)}</#macro>
 
 <#macro "field"><#-- shouldn't be called directly, but just in case --><#recurse/></#macro>
 <#macro "conditional-field"><#-- shouldn't be called directly, but just in case --><#recurse/></#macro>

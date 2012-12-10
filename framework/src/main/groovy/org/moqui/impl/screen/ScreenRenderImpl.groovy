@@ -72,6 +72,8 @@ class ScreenRenderImpl implements ScreenRender {
     protected Writer internalWriter = null
     protected Writer afterFormWriter = null
 
+    protected boolean dontDoRender = false
+
     protected Map<String, Node> screenFormNodeCache = new HashMap()
 
     ScreenRenderImpl(ScreenFacadeImpl sfi) {
@@ -161,6 +163,15 @@ class ScreenRenderImpl implements ScreenRender {
         internalWriter = new StringWriter()
         internalRender()
         return internalWriter.toString()
+    }
+
+    /** this should be called as part of a always-actions or pre-actions block to stop rendering before it starts */
+    void sendRedirectAndStopRender(String redirectUrl) {
+        if (response != null) {
+            response.sendRedirect(redirectUrl)
+            dontDoRender = true
+            logger.info("Redirecting to [${redirectUrl}] instead of rendering [${this.getScreenUrlInfo().getFullPathNameList()}]")
+        }
     }
 
     protected ResponseItem recursiveRunTransition(Iterator<ScreenDefinition> sdIterator) {
@@ -316,8 +327,8 @@ class ScreenRenderImpl implements ScreenRender {
                 if (ri.type == "screen-last" || ri.type == "screen-last-noparam") {
                     String savedUrl = wfi.getRemoveScreenLastPath()
                     urlType = "screen-path"
-                    url = savedUrl ?: "/"
                     // if no saved URL, just go to root/default; avoid getting stuck on Login screen, etc
+                    url = savedUrl ?: "/"
                 }
                 if (ri.type == "screen-last") {
                     wfi.removeScreenLastParameters(true)
@@ -341,7 +352,17 @@ class ScreenRenderImpl implements ScreenRender {
                     // default is screen-path
                     ScreenUrlInfo fullUrl = buildUrl(rootScreenDef, screenUrlInfo.preTransitionPathNameList, url)
                     fullUrl.addParameters(ri.expandParameters(ec))
-                    response.sendRedirect(fullUrl.getUrlWithParams())
+                    // if this was a screen-last and the screen has declared parameters include them in the URL
+                    Map savedParameters = ((WebFacadeImpl) ec.web)?.getSavedParameters()
+                    if (ri.type == "screen-last" && savedParameters && fullUrl.getTargetScreen()?.getParameterMap()) {
+                        for (String parmName in fullUrl.getTargetScreen().getParameterMap().keySet()) {
+                            if (savedParameters.get(parmName))
+                                fullUrl.addParameter(parmName, savedParameters.get(parmName))
+                        }
+                    }
+                    String fullUrlString = fullUrl.getUrlWithParams()
+                    logger.info("Finished transition [${getScreenUrlInfo().getFullPathNameList()}], redirecting to [${fullUrlString}]")
+                    response.sendRedirect(fullUrlString)
                 }
             } else {
                 List<String> pathElements = url.split("/") as List
@@ -475,6 +496,9 @@ class ScreenRenderImpl implements ScreenRender {
         long screenStartTime = System.currentTimeMillis()
         boolean beganTransaction = screenUrlInfo.beginTransaction ? sfi.ecfi.transactionFacade.begin(null) : false
         try {
+            // make sure this (sri) is in the context before running actions
+            ec.context.put("sri", this)
+
             // run always-actions for all screens in path
             boolean hasAlwaysActions = false
             for (ScreenDefinition sd in screenUrlInfo.screenPathDefList) if (sd.alwaysActions != null) { hasAlwaysActions = true; break }
@@ -489,6 +513,9 @@ class ScreenRenderImpl implements ScreenRender {
                 Iterator<ScreenDefinition> screenDefIterator = screenUrlInfo.screenRenderDefList.iterator()
                 recursiveRunActions(screenDefIterator, false, true)
             }
+
+            // if dontDoRender then quit now; this should be set during always-actions or pre-actions
+            if (dontDoRender) return
 
             if (response != null) {
                 response.setContentType(this.outputContentType)
@@ -542,7 +569,7 @@ class ScreenRenderImpl implements ScreenRender {
                 && !ec.getUser().getUserId() && !ec.getUser().getLoggedInAnonymous()) {
             logger.info("Screen at location [${currentSd.location}], which is part of [${screenUrlInfo.fullPathNameList}] under screen [${screenUrlInfo.fromSd.location}] requires authentication but no user is currently logged in.")
             // save the request as a save-last to use after login
-            if (ec.web) {
+            if (ec.web && screenUrlInfo.fileResourceRef == null) {
                 StringBuilder screenPath = new StringBuilder()
                 for (String pn in screenUrlInfo.fullPathNameList) screenPath.append("/").append(pn)
                 ((WebFacadeImpl) ec.web).saveScreenLastInfo(screenPath.toString(), null)
@@ -603,6 +630,7 @@ class ScreenRenderImpl implements ScreenRender {
         return boundaryComments
     }
 
+    ScreenDefinition getRootScreenDef() { return rootScreenDef }
     ScreenDefinition getActiveScreenDef() { return screenUrlInfo.screenRenderDefList[screenPathIndex] }
 
     List<String> getActiveScreenPath() {
@@ -760,6 +788,10 @@ class ScreenRenderImpl implements ScreenRender {
     String renderText(String location, String isTemplateStr) {
         boolean isTemplate = (isTemplateStr != "false")
 
+        if (!location || location == "null") {
+            logger.warn("Not rendering text in screen [${getActiveScreenDef().location}], location was empty")
+            return ""
+        }
         if (isTemplate) {
             writer.flush()
             // NOTE: run templates with their own variable space so we can add sri, and avoid getting anything added from within
@@ -796,10 +828,11 @@ class ScreenRenderImpl implements ScreenRender {
         return ui
     }
 
-    ScreenUrlInfo makeUrlByType(String url, String urlType, FtlNodeWrapper parameterParentNodeWrapper) {
+    ScreenUrlInfo makeUrlByType(String origUrl, String urlType, FtlNodeWrapper parameterParentNodeWrapper) {
         /* TODO handle urlType=content
             A content location (without the content://). URL will be one that can access that content.
          */
+        String url = ec.resource.evaluateStringExpand(origUrl, "")
         ScreenUrlInfo sui
         switch (urlType) {
             // for transition we want a URL relative to the current screen, so just pass that to buildUrl
@@ -910,6 +943,14 @@ class ScreenRenderImpl implements ScreenRender {
     }
 
     ScreenUrlInfo getCurrentScreenUrl() { return screenUrlInfo }
+    URI getBaseLinkUri() {
+        String urlString = baseLinkUrl ?: getCurrentScreenUrl().getUrl()
+        URL blu = new URL(urlString)
+        // NOTE: not including user info, query, or fragment... should consider them?
+        // NOTE: using the multi-argument constructor so it will encode stuff
+        URI baseUri = new URI(blu.getProtocol(), null, blu.getHost(), blu.getPort(), blu.getPath(), null, null)
+        return baseUri
+    }
 
     String getCurrentThemeId() {
         String stteId = null

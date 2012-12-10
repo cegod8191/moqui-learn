@@ -14,49 +14,43 @@ package org.moqui.impl.context.reference
 import org.moqui.context.ResourceReference
 import org.moqui.context.ExecutionContext
 import org.moqui.impl.StupidUtilities
+import org.moqui.BaseException
 
-class UrlResourceReference implements ResourceReference {
+class UrlResourceReference extends BaseResourceReference {
     protected final static org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(UrlResourceReference.class)
 
     URL locationUrl = null
-    ExecutionContext ec = null
     Boolean exists = null
-    boolean isFile = false
-    
+    boolean isFileProtocol = false
+    File localFile = null
+
     UrlResourceReference() { }
     
     @Override
     ResourceReference init(String location, ExecutionContext ec) {
         this.ec = ec
+        if (!location) throw new BaseException("Cannot create URL Resource Reference with empty location")
         if (location.startsWith("/") || location.indexOf(":") < 0) {
             // no prefix, local file: if starts with '/' is absolute, otherwise is relative to runtime path
             if (location.charAt(0) != '/') location = ec.ecfi.runtimePath + '/' + location
-            locationUrl = new File(location).toURI().toURL()
-            isFile = true
+            locationUrl = new URL("file:" + location)
+            isFileProtocol = true
         } else {
             locationUrl = new URL(location)
-            isFile = (locationUrl?.protocol == "file")
+            isFileProtocol = (locationUrl?.protocol == "file")
         }
         return this
     }
 
     File getFile() {
+        if (localFile != null) return localFile
         // NOTE: using toExternalForm().substring(5) instead of toURI because URI does not allow spaces in a filename
-        File f = new File(locationUrl.toExternalForm().substring(5))
-        return f
+        localFile = new File(locationUrl.toExternalForm().substring(5))
+        return localFile
     }
 
     @Override
     String getLocation() { return locationUrl?.toString() }
-
-    @Override
-    URI getUri() { return locationUrl?.toURI() }
-    @Override
-    String getFileName() {
-        if (!locationUrl) return null
-        String path = locationUrl.getPath()
-        return path.contains("/") ? path.substring(path.lastIndexOf("/")+1) : path
-    }
 
     @Override
     InputStream openStream() { return locationUrl?.openStream() }
@@ -65,13 +59,7 @@ class UrlResourceReference implements ResourceReference {
     String getText() { return StupidUtilities.getStreamText(openStream()) }
 
     @Override
-    String getContentType() {
-        if (!locationUrl) return null
-        ec.resource.getContentType(getFileName())
-    }
-
-    @Override
-    boolean supportsAll() { isFile }
+    boolean supportsAll() { isFileProtocol }
 
     @Override
     boolean supportsUrl() { return true }
@@ -79,10 +67,10 @@ class UrlResourceReference implements ResourceReference {
     URL getUrl() { return locationUrl }
 
     @Override
-    boolean supportsDirectory() { isFile }
+    boolean supportsDirectory() { isFileProtocol }
     @Override
     boolean isFile() {
-        if (isFile) {
+        if (isFileProtocol) {
             return getFile().isFile()
         } else {
             throw new IllegalArgumentException("Is file not supported for resource with protocol [${locationUrl.protocol}]")
@@ -90,7 +78,7 @@ class UrlResourceReference implements ResourceReference {
     }
     @Override
     boolean isDirectory() {
-        if (isFile) {
+        if (isFileProtocol) {
             return getFile().isDirectory()
         } else {
             throw new IllegalArgumentException("Is directory not supported for resource with protocol [${locationUrl.protocol}]")
@@ -98,11 +86,11 @@ class UrlResourceReference implements ResourceReference {
     }
     @Override
     List<ResourceReference> getDirectoryEntries() {
-        if (isFile) {
+        if (isFileProtocol) {
             File f = getFile()
             List<ResourceReference> children = new LinkedList<ResourceReference>()
             for (File dirFile in f.listFiles()) {
-                children.add(new UrlResourceReference().init(dirFile.toURI().toString(), ec))
+                children.add(new UrlResourceReference().init(dirFile.absolutePath, ec))
             }
             return children
         } else {
@@ -111,12 +99,13 @@ class UrlResourceReference implements ResourceReference {
     }
 
     @Override
-    boolean supportsExists() { return isFile || exists != null }
+    boolean supportsExists() { return isFileProtocol || exists != null }
     @Override
     boolean getExists() {
-        if (exists != null) return exists
+        // only count exists if true
+        if (exists) return true
 
-        if (isFile) {
+        if (isFileProtocol) {
             exists = getFile().exists()
             return exists
         } else {
@@ -124,18 +113,47 @@ class UrlResourceReference implements ResourceReference {
         }
     }
 
-    boolean supportsLastModified() { isFile }
+    boolean supportsLastModified() { isFileProtocol }
     long getLastModified() {
-        if (isFile) {
+        if (isFileProtocol) {
             return getFile().lastModified()
         } else {
             System.currentTimeMillis()
         }
     }
 
-    @Override
-    void destroy() { }
+    boolean supportsWrite() { isFileProtocol }
+    void putText(String text) {
+        // first make sure the directory exists that this is in
+        if (!getFile().parentFile.exists()) getFile().parentFile.mkdirs()
+        // now write the text to the file and close it
+        FileWriter fw = new FileWriter(getFile())
+        fw.write(text)
+        fw.close()
+        this.exists = null
+    }
+    void putStream(InputStream stream) {
+        OutputStream os = new FileOutputStream(getFile())
+        StupidUtilities.copyStream(stream, os)
+        stream.close()
+        os.close()
+        this.exists = null
+    }
 
-    @Override
-    String toString() { return getLocation() ?: "[no location (${this.class.getName()})]" }
+    void move(String newLocation) {
+        if (!newLocation) throw new IllegalArgumentException("No location specified, not moving resource at ${getLocation()}")
+        ResourceReference newRr = ec.resource.getLocationReference(newLocation)
+        String path = null
+        if (newRr.getUrl().getProtocol() == "file") {
+            path = newRr.getUrl().toExternalForm().substring(5)
+        } else {
+            throw new IllegalArgumentException("Location [${newLocation}] is not a file location, not moving resource at ${getLocation()}")
+        }
+
+        if (isFileProtocol) {
+            getFile().renameTo(new File(path))
+        } else {
+            throw new IllegalArgumentException("Move not supported for resource [${getLocation()}] with protocol [${locationUrl?.protocol}]")
+        }
+    }
 }
