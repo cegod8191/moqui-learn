@@ -12,7 +12,14 @@
 
 tasks.withType(Compile) {
     options.compilerArgs << "-Xlint:unchecked"
+    options.encoding = "UTF-8"
 }
+
+
+tasks.withType(GroovyCompile) {
+    groovyOptions.encoding = "MacRoman"
+}
+
 
 apply plugin: 'groovy'
 apply plugin: 'war'
