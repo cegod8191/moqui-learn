@@ -21,6 +21,16 @@ def moquiRuntime = './runtime'
 def moquiConfDev = 'conf/MoquiDevConf.xml'
 def moquiConfProduction = 'conf/MoquiProductionConf.xml'
 
+
+tasks.withType(GroovyCompile) {
+    groovyOptions.encoding = "MacRoman"
+}
+
+tasks.withType(Compile) {
+    options.encoding = "UTF-8"
+}
+
+
 // ========== clean tasks ==========
 
 task clean(type: Delete) { delete file(warName); delete file(execTempDir) }
